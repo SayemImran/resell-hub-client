@@ -1,85 +1,169 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   Bars,
   Xmark,
-  Bell,
-  ShoppingCart,
   Magnifier,
+  House,
+  Boxes3,
+  Folder,
+  LayoutSideContent,
 } from "@gravity-ui/icons";
-import { Button, Input, Avatar } from "@heroui/react";
 import { CustomAvatar } from "../profiles/CustomAvatar";
-import Link from "next/link";
+import { authClient } from "@/lib/auth-client";
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const { data: sessionData } = authClient.useSession();
+  const currentuser = sessionData?.user.name;
+  console.log("current user :",currentuser);
+
+  const Links = [
+    { name: "Home", href: "/", icon: House },
+    { name: "Products", href: "/products", icon: Boxes3 },
+    { name: "Category", href: "/category", icon: Folder },
+    { name: "Dashboard", href: "/dashboard", icon: LayoutSideContent },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6 h-16 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-primary">
-          ReSell Hub
-        </h1>
+    <header className="sticky top-0 z-50 px-4 py-3">
+      <nav className="mx-auto max-w-7xl rounded-2xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-lg shadow-black/5">
+        <div className="flex items-center justify-between px-6 py-4">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold shadow-lg">
+              RH
+            </div>
+            <div>
+              <h1 className="text-lg font-bold">Resell Hub</h1>
+              <p className="text-xs text-gray-500">Buy • Sell • Grow</p>
+            </div>
+          </Link>
 
-        <nav className="hidden md:flex items-center gap-8">
-          <a href="#" className="text-primary font-medium">
-            Marketplace
-          </a>
-          <a href="#">Categories</a>
-          <a href="#">Enterprise</a>
-          <a href="#">Help</a>
-        </nav>
+          {/* Desktop Nav Links */}
+          <div className="hidden lg:flex items-center gap-2">
+            {Links.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-2 rounded-xl px-4 py-2 transition-all duration-300 ${
+                    pathname === item.href
+                      ? "bg-white/20 text-indigo-600 font-semibold"
+                      : "hover:bg-white/10"
+                  }`}
+                >
+                  <Icon width={18} height={18} />
+                  {item.name}
+                </Link>
+              );
+            })}
+          </div>
 
-        <div className="hidden lg:block w-72">
-          <Input
-            placeholder="Search marketplace..."
-            startcontent={<Magnifier />}
-          />
-        </div>
+          {/* Search */}
+          <div className="hidden md:block flex-1 max-w-md mx-8">
+            <div className="relative">
+              <Magnifier
+                width={18}
+                height={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+              />
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="w-full rounded-full border border-white/20 bg-white/10 py-2.5 pl-11 pr-4 backdrop-blur-md outline-none focus:border-indigo-500"
+              />
+            </div>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <Button isIconOnly variant="light">
-            <Bell />
-          </Button>
+          {/* Desktop Auth */}
+          <div className="hidden md:flex items-center gap-3">
+            {currentuser ? (
+              <CustomAvatar />
+            ) : (
+              <>
+                <Link
+                  href="/auth/login"
+                  className="rounded-full px-4 py-2 hover:bg-white/10 transition"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="rounded-full bg-gradient-to-r from-indigo-600 to-purple-600 px-5 py-2 text-white font-medium shadow-md"
+                >
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
 
-          <Button isIconOnly variant="light">
-            <ShoppingCart />
-          </Button>
-
-            <Link href="/auth/login">
-            <Button>
-                login
-            </Button>
-            </Link>
-
-            <Link href="/auth/register">
-               <Button>
-                Register
-            </Button>
-            </Link>
-         
-          <CustomAvatar/>
-
-          <button
-            className="md:hidden"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <Xmark /> : <Bars />}
+          {/* Mobile Toggle */}
+          <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden">
+            {menuOpen ? (
+              <Xmark width={24} height={24} />
+            ) : (
+              <Bars width={24} height={24} />
+            )}
           </button>
         </div>
-      </div>
 
-      {open && (
-        <div className="md:hidden border-t bg-white">
-          <div className="flex flex-col p-4 gap-4">
-            <a href="#">Marketplace</a>
-            <a href="#">Categories</a>
-            <a href="#">Enterprise</a>
-            <a href="#">Help</a>
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div className="border-t border-white/10 px-6 py-4 lg:hidden">
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search products..."
+                className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 outline-none"
+              />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              {Links.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 hover:bg-white/10"
+                  >
+                    <Icon width={18} height={18} />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Mobile Auth */}
+            <div className="mt-5 flex flex-col gap-3">
+              {currentuser ? (
+                <CustomAvatar />
+              ) : (
+                <>
+                  <Link
+                    href="/auth/login"
+                    className="rounded-xl border border-white/20 px-4 py-3 text-center"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/auth/register"
+                    className="rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 text-center text-white"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </nav>
     </header>
   );
 }

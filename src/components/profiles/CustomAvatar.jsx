@@ -1,7 +1,10 @@
-import {ArrowRightFromSquare, Gear, Persons} from "@gravity-ui/icons";
-import {Avatar, Dropdown, Label} from "@heroui/react";
+import { signOut } from "@/lib/auth-client";
+import { ArrowRightFromSquare, Gear, Persons } from "@gravity-ui/icons";
+import { Avatar, Dropdown, Label } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
 export function CustomAvatar() {
+  const router = useRouter();
   return (
     <Dropdown>
       <Dropdown.Trigger className="rounded-full">
@@ -25,7 +28,9 @@ export function CustomAvatar() {
             </Avatar>
             <div className="flex flex-col gap-0">
               <p className="text-sm leading-5 font-medium">Jane Doe</p>
-              <p className="text-xs leading-none text-muted">jane@example.com</p>
+              <p className="text-xs leading-none text-muted">
+                jane@example.com
+              </p>
             </div>
           </div>
         </div>
@@ -36,8 +41,28 @@ export function CustomAvatar() {
           <Dropdown.Item id="profile" textValue="Profile">
             <Label>Profile</Label>
           </Dropdown.Item>
-        
-          <Dropdown.Item id="logout" textValue="Logout" variant="danger">
+          <Dropdown.Item id="settings" textValue="Settings">
+            <div className="flex w-full items-center justify-between gap-2">
+              <Label>Settings</Label>
+              <Gear className="size-3.5 text-muted" />
+            </div>
+          </Dropdown.Item>
+          <Dropdown.Item id="new-project" textValue="New project">
+            <div className="flex w-full items-center justify-between gap-2">
+              <Label>Create Team</Label>
+              <Persons className="size-3.5 text-muted" />
+            </div>
+          </Dropdown.Item>
+          <Dropdown.Item
+            id="logout"
+            textValue="Logout"
+            variant="danger"
+            onClick={async () => {
+              await signOut();
+              router.push("/auth/login");
+              router.refresh();
+            }}
+          >
             <div className="flex w-full items-center justify-between gap-2">
               <Label>Log Out</Label>
               <ArrowRightFromSquare className="size-3.5 text-danger" />

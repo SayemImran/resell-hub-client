@@ -1,248 +1,288 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import Link from "next/link";
+import { useForm, Controller } from "react-hook-form";
+import {
+  Button,
+  TextField,
+  InputGroup,
+  Label,
+  Radio,
+  RadioGroup,
+  FieldError,
+} from "@heroui/react";
+import { Envelope, Lock, Person } from "@gravity-ui/icons";
+import { signUp } from "@/lib/auth-client";
+import { toast } from "sonner";
+import NavLink from "../navlink/NavLink";
 
 export default function RegisterForm() {
   const {
-    register,
+    control,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({
-    mode: "onChange",
-    reValidateMode: "onChange",
     defaultValues: {
-      role: "buyer",
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      role: "seeker",
     },
+    mode: "onChange", // Triggers real-time validation checks as the user types
   });
 
-  const onSubmit = (data) => {
-    console.log("Form Data:", data);
+  // Watch values for live checklist evaluations
+  const passwordValue = watch("password", "");
+  const confirmPasswordValue = watch("confirmPassword", "");
+
+  // Evaluation criteria for the password checklist
+  const checks = {
+    min: passwordValue.length >= 6,
+    upper: /[A-Z]/.test(passwordValue),
+    lower: /[a-z]/.test(passwordValue),
+    number: /[0-9]/.test(passwordValue),
   };
 
-  const role = watch("role");
-  const password = watch("password", "");
-  const hasMinLength = password.length >= 8;
-  const hasNumber = /\d/.test(password);
-  const hasUppercase = /[A-Z]/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  const isMatching = passwordValue && passwordValue === confirmPasswordValue;
+
+  const onSubmit = async (data) => {
+    const { error } = await signUp.email({
+      ...data,
+      // email: data.email,
+      // password: data.password,
+      // name: data.name,
+      // role: data.role,
+      autoSignIn: false,
+    });
+    if(!error){
+      toast.success("Account created successfully! Please log in.");
+    }
+    else{
+      toast.error(error.message || "Failed to create account. Please try again.");
+    }
+    console.log("Form Submitted Successfully:", data);
+    console.log("Sign Up Result:", { error });
+  };
+
+  // Reusable component for the validation list indicators
+  const ChecklistItem = ({ ok, text }) => (
+    <div className="flex items-center gap-2 text-sm mt-1 transition-colors duration-200">
+      <div
+        className={`w-4 h-4 rounded-full border flex items-center justify-center transition-all ${
+          ok ? "bg-green-500 border-green-500" : "border-gray-400"
+        }`}
+      />
+      <span className={ok ? "text-green-500 font-medium" : "text-gray-400"}>
+        {text}
+      </span>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.18),_transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(168,85,247,0.15),_transparent_28%)] text-on-background flex items-center justify-center px-4 py-8">
-      <main className="w-full max-w-6xl">
-        <div className="mx-auto rounded-[32px] border border-white/20 bg-white/15 shadow-2xl backdrop-blur-xl p-6 md:p-10">
-          <div className="grid gap-8 lg:grid-cols-[0.9fr_1.5fr] items-start">
-            <div className="rounded-[28px] border border-white/20 bg-white/40 p-6 shadow-xl backdrop-blur-xl">
-              <h2 className="text-3xl font-bold text-primary mb-4">
-                Password requirements
-              </h2>
-              <p className="text-sm text-gray-700 mb-6">
-                Your password must include all of the following while typing.
-              </p>
-              <ul className="space-y-4 text-sm text-gray-800">
-                <li className="flex items-center gap-3">
-                  <span className={`h-6 w-6 rounded-full flex items-center justify-center text-white ${hasMinLength ? "bg-green-500" : "bg-gray-300"}`}>
-                    {hasMinLength ? "✔" : "✕"}
-                  </span>
-                  At least 8 characters
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className={`h-6 w-6 rounded-full flex items-center justify-center text-white ${hasNumber ? "bg-green-500" : "bg-gray-300"}`}>
-                    {hasNumber ? "✔" : "✕"}
-                  </span>
-                  At least one number
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className={`h-6 w-6 rounded-full flex items-center justify-center text-white ${hasUppercase ? "bg-green-500" : "bg-gray-300"}`}>
-                    {hasUppercase ? "✔" : "✕"}
-                  </span>
-                  At least one uppercase letter
-                </li>
-                <li className="flex items-center gap-3">
-                  <span className={`h-6 w-6 rounded-full flex items-center justify-center text-white ${hasSpecialChar ? "bg-green-500" : "bg-gray-300"}`}>
-                    {hasSpecialChar ? "✔" : "✕"}
-                  </span>
-                  At least one special character
-                </li>
-              </ul>
-            </div>
-
-            {/* RIGHT SIDE */}
-            <div className="w-full flex items-center justify-center px-6 py-10 overflow-y-auto">
-              <div className="w-full max-w-2xl">
-            <h1 className="text-3xl font-bold mb-2">Create Account</h1>
-            <p className="text-sm text-gray-500 mb-6">
-              Join our marketplace community
-            </p>
-
-            <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-
-          
-            
-
-              {/* NAME */}
-              <div>
-                <label className="text-sm font-medium">Full Name</label>
-                <input
-                  type="text"
-                  placeholder="John Doe"
-                  {...register("name", { required: true })}
-                  className="w-full border p-3 rounded-xl mt-1 focus:outline-blue-500"
-                />
-              </div>
-
-              {/* EMAIL */}
-              <div>
-                <label className="text-sm font-medium">Email</label>
-                <input
-                  type="email"
-                  placeholder="john@example.com"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: "Enter a valid email address",
-                    },
-                  })}
-                  className="w-full border p-3 rounded-xl mt-1 focus:outline-blue-500"
-                />
-                {errors.email && (
-                  <p className="text-sm text-red-600 mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-
-              {/* PASSWORD */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-sm font-medium">Password</label>
-                  <input
-                    type="password"
-                    {...register("password", {
-                      required: "Password is required",
-                      minLength: {
-                        value: 8,
-                        message: "Password must be at least 8 characters",
-                      },
-                      validate: (value) =>
-                        /\d/.test(value)
-                          ? /[A-Z]/.test(value)
-                            ? /[!@#$%^&*(),.?":{}|<>]/.test(value)
-                              ? true
-                              : "Password must contain at least one special character"
-                            : "Password must contain at least one uppercase letter"
-                          : "Password must contain at least one number",
-                    })}
-                    className="w-full border p-3 rounded-xl mt-1 focus:outline-blue-500"
-                  />
-                  {errors.password && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {errors.password.message}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium">Confirm</label>
-                  <input
-                    type="password"
-                    {...register("confirmPassword", {
-                      required: "Please confirm your password",
-                      validate: (value) =>
-                        value === password || "Passwords do not match",
-                    })}
-                    className="w-full border p-3 rounded-xl mt-1 focus:outline-blue-500"
-                  />
-                  {errors.confirmPassword && (
-                    <p className="text-sm text-red-600 mt-1">
-                      {errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* IMAGE URL */}
-              <div>
-                <label className="text-sm font-medium">Profile Image URL</label>
-                <input
-                  type="text"
-                  placeholder="https://example.com/image.jpg"
-                  {...register("image")}
-                  className="w-full border p-3 rounded-xl mt-1 focus:outline-blue-500"
-                />
-              </div>
-                  {/* ROLE */}
-                <div>
-                <label className="block text-sm font-medium mb-2">
-                  Select Role
-                </label>
-
-                <div className="flex gap-6">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      value="buyer"
-                      {...register("role")}
-                      checked={role === "buyer"}
-                    />
-                    Buyer
-                  </label>
-
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      value="seller"
-                      {...register("role")}
-                      checked={role === "seller"}
-                    />
-                    Seller
-                  </label>
-                </div>
-              </div>
-
-              {/* LOCATION */}
-              <div>
-                <label className="text-sm font-medium">Location</label>
-                <select
-                  {...register("location")}
-                  className="w-full border p-3 rounded-xl mt-1 bg-white focus:outline-blue-500"
-                >
-                  <option value="">Select location</option>
-                  <option value="Dhaka">Dhaka</option>
-                  <option value="Chattogram">Chattogram</option>
-                  <option value="Sylhet">Sylhet</option>
-                </select>
-              </div>
-
-              {/* SUBMIT */}
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold transition hover:bg-blue-700"
-              >
-                Register
-              </button>
-
-              {/* GOOGLE */}
-              <button
-                type="button"
-                className="w-full border py-3 rounded-xl flex items-center justify-center gap-2 transition hover:bg-gray-50"
-              >
-                Continue with Google
-              </button>
-            </form>
-
-            <p className="text-center text-sm mt-6 text-gray-500">
-              Already have an account?{" "}
-              <a className="text-blue-600 font-medium hover:underline" href="#">
-                Login
-              </a>
-            </p>
-          </div>
-            </div>
-          </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-default-50 to-default-100 px-4">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/10 backdrop-blur-xl shadow-xl p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-foreground">Create Account</h1>
+          <p className="text-sm text-default-500">
+            Join and start applying for jobs
+          </p>
         </div>
-      </main>
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          {/* Name */}
+          <Controller
+            name="name"
+            control={control}
+            rules={{ required: "Full name is required" }}
+            render={({ field, fieldState }) => (
+              <TextField className="mb-4 w-full" isInvalid={fieldState.invalid}>
+                <Label>Full Name</Label>
+                <InputGroup>
+                  <InputGroup.Prefix>
+                    <Person />
+                  </InputGroup.Prefix>
+                  <InputGroup.Input {...field} placeholder="full name" />
+                </InputGroup>
+                {fieldState.error && (
+                  <FieldError>{fieldState.error.message}</FieldError>
+                )}
+              </TextField>
+            )}
+          />
+          {/* Profile image link */}
+          <Controller
+            name="Profile Image Link"
+            control={control}
+            render={({ field, fieldState }) => (
+              <TextField className="mb-4 w-full" isInvalid={fieldState.invalid}>
+                <Label>Profile Image Link</Label>
+                <InputGroup>
+                  <InputGroup.Prefix>
+                    <Person />
+                  </InputGroup.Prefix>
+                  <InputGroup.Input {...field} placeholder="https://example.com/..." />
+                </InputGroup>
+                {fieldState.error && (
+                  <FieldError>{fieldState.error.message}</FieldError>
+                )}
+              </TextField>
+            )}
+          />
+
+          {/* Email */}
+          <Controller
+            name="email"
+            control={control}
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Invalid email address",
+              },
+            }}
+            render={({ field, fieldState }) => (
+              <TextField className="mb-4 w-full" isInvalid={fieldState.invalid}>
+                <Label>Email</Label>
+                <InputGroup>
+                  <InputGroup.Prefix>
+                    <Envelope />
+                  </InputGroup.Prefix>
+                  <InputGroup.Input
+                    {...field}
+                    type="email"
+                    placeholder="name@email.com"
+                  />
+                </InputGroup>
+                {fieldState.error && (
+                  <FieldError>{fieldState.error.message}</FieldError>
+                )}
+              </TextField>
+            )}
+          />
+
+          {/* Password */}
+          <Controller
+            name="password"
+            control={control}
+            rules={{
+              required: "Password is required",
+              validate: {
+                min: (v) => v.length >= 6 || "Must be at least 6 characters",
+                upper: (v) =>
+                  /[A-Z]/.test(v) || "Must contain an uppercase letter",
+                lower: (v) =>
+                  /[a-z]/.test(v) || "Must contain a lowercase letter",
+                number: (v) => /[0-9]/.test(v) || "Must contain a number",
+              },
+            }}
+            render={({ field, fieldState }) => (
+              <TextField className="mb-2 w-full" isInvalid={fieldState.invalid}>
+                <Label>Password</Label>
+                <InputGroup>
+                  <InputGroup.Prefix>
+                    <Lock />
+                  </InputGroup.Prefix>
+                  <InputGroup.Input
+                    {...field}
+                    type="password"
+                    placeholder="••••••••"
+                  />
+                </InputGroup>
+              </TextField>
+            )}
+          />
+
+          {/* PASSWORD CHECKLIST */}
+          <div className="mb-4">
+            <ChecklistItem ok={checks.min} text="At least 6 characters" />
+            <ChecklistItem ok={checks.upper} text="One uppercase letter" />
+            <ChecklistItem ok={checks.lower} text="One lowercase letter" />
+            <ChecklistItem ok={checks.number} text="One number" />
+          </div>
+
+          {/* Confirm Password */}
+          <Controller
+            name="confirmPassword"
+            control={control}
+            rules={{
+              required: "Please confirm your password",
+              validate: (v) => v === passwordValue || "Passwords must match",
+            }}
+            render={({ field, fieldState }) => (
+              <TextField className="mb-2 w-full" isInvalid={fieldState.invalid}>
+                <Label>Confirm Password</Label>
+                <InputGroup>
+                  <InputGroup.Prefix>
+                    <Lock />
+                  </InputGroup.Prefix>
+                  <InputGroup.Input
+                    {...field}
+                    type="password"
+                    placeholder="••••••••"
+                  />
+                </InputGroup>
+              </TextField>
+            )}
+          />
+
+          {/* Match check */}
+          <div className="mb-4">
+            <ChecklistItem ok={isMatching} text="Passwords must match" />
+          </div>
+
+          {/* Role Radio */}
+          <div className="flex flex-col gap-2 mb-6">
+            <Label>Account type</Label>
+            <Controller
+              name="role"
+              control={control}
+              render={({ field }) => (
+                <RadioGroup
+                  {...field}
+                  orientation="horizontal"
+                  aria-label="Select account type"
+                  className="flex justify-between"
+                >
+                  <Radio value="Buyer">
+                    <Radio.Content>
+                      <Radio.Control>
+                        <Radio.Indicator />
+                      </Radio.Control>
+                      Buyer
+                    </Radio.Content>
+                  </Radio>
+                  <Radio value="Seller">
+                    <Radio.Content>
+                      <Radio.Control>
+                        <Radio.Indicator />
+                      </Radio.Control>
+                      Seller
+                    </Radio.Content>
+                  </Radio>
+                </RadioGroup>
+              )}
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full"
+            color="primary"
+            isDisabled={!isValid}
+          >
+            Create Account
+          </Button>
+        </form>
+
+        <p className="text-center text-sm text-default-500 mt-6">
+          Already have an account?{" "}
+          <NavLink href="/auth/login" className="text-primary hover:underline">
+            Login
+          </NavLink>
+        </p>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,5 @@
+// dashboard/admin/page.jsx
+
+export default function AdminDashboard() {
+  return <div>Admin Dashboard</div>;
+}

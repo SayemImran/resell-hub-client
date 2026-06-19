@@ -20,13 +20,18 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: sessionData } = authClient.useSession();
   const currentuser = sessionData?.user.name;
+  const role = sessionData?.user.role.toLowerCase();
   console.log("current user :",currentuser);
-
+  console.log("current role :",role);
+ 
+  if(pathname.includes('dashboard')){
+    return null;
+  }
   const Links = [
     { name: "Home", href: "/", icon: House },
     { name: "Products", href: "/products", icon: Boxes3 },
     { name: "Category", href: "/category", icon: Folder },
-    { name: "Dashboard", href: "/dashboard", icon: LayoutSideContent },
+    { name: "Dashboard", href: `/dashboard/${role}`, icon: LayoutSideContent },
   ];
 
   return (

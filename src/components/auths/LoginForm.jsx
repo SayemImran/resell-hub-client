@@ -36,7 +36,7 @@ export default function LoginForm() {
 
     if(!error){
       toast.success("Logged in successfully!");
-      router.push("/dashboard/buyer"); 
+      router.push(`/`); 
       router.refresh();
     }else{
       toast.error(error.message || "Failed to log in. Please try again.");

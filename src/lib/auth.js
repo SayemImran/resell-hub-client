@@ -22,6 +22,7 @@ export const auth = betterAuth({
       },
       profile:{
         type:"string",
+        input: true,
       }
     }
   }

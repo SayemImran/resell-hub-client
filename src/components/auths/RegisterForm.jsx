@@ -15,8 +15,10 @@ import { Envelope, Lock, Person } from "@gravity-ui/icons";
 import { signUp } from "@/lib/auth-client";
 import { toast } from "sonner";
 import NavLink from "../navlink/NavLink";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
+  const router = useRouter();
   const {
     control,
     handleSubmit,
@@ -29,8 +31,9 @@ export default function RegisterForm() {
       password: "",
       confirmPassword: "",
       role: "seeker",
+      profile: "",
     },
-    mode: "onChange", // Triggers real-time validation checks as the user types
+    mode: "onChange",
   });
 
   // Watch values for live checklist evaluations
@@ -50,17 +53,16 @@ export default function RegisterForm() {
   const onSubmit = async (data) => {
     const { error } = await signUp.email({
       ...data,
-      // email: data.email,
-      // password: data.password,
-      // name: data.name,
-      // role: data.role,
       autoSignIn: false,
     });
-    if(!error){
+    if (!error) {
       toast.success("Account created successfully! Please log in.");
-    }
-    else{
-      toast.error(error.message || "Failed to create account. Please try again.");
+      router.push("/auth/login");
+      router.refresh();
+    } else {
+      toast.error(
+        error.message || "Failed to create account. Please try again.",
+      );
     }
     console.log("Form Submitted Successfully:", data);
     console.log("Sign Up Result:", { error });
@@ -91,6 +93,7 @@ export default function RegisterForm() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
+
           {/* Name */}
           <Controller
             name="name"
@@ -111,9 +114,10 @@ export default function RegisterForm() {
               </TextField>
             )}
           />
+
           {/* Profile image link */}
           <Controller
-            name="Profile Image Link"
+            name="profile"
             control={control}
             render={({ field, fieldState }) => (
               <TextField className="mb-4 w-full" isInvalid={fieldState.invalid}>
@@ -122,7 +126,10 @@ export default function RegisterForm() {
                   <InputGroup.Prefix>
                     <Person />
                   </InputGroup.Prefix>
-                  <InputGroup.Input {...field} placeholder="https://example.com/..." />
+                  <InputGroup.Input
+                    {...field}
+                    placeholder="https://example.com/..."
+                  />
                 </InputGroup>
                 {fieldState.error && (
                   <FieldError>{fieldState.error.message}</FieldError>

@@ -1,9 +1,13 @@
-import { signOut } from "@/lib/auth-client";
+import { authClient, signOut } from "@/lib/auth-client";
 import { ArrowRightFromSquare, Gear, Persons } from "@gravity-ui/icons";
 import { Avatar, Dropdown, Label } from "@heroui/react";
 import { useRouter } from "next/navigation";
 
 export function CustomAvatar() {
+  const {data:sessionData} = authClient.useSession();
+  const name = sessionData?.user.name;
+  const email = sessionData?.user.email;
+  const imglink = sessionData?.user.profile;
   const router = useRouter();
   return (
     <Dropdown>
@@ -11,7 +15,7 @@ export function CustomAvatar() {
         <Avatar>
           <Avatar.Image
             alt="Junior Garcia"
-            src="https://heroui-assets.nyc3.cdn.digitaloceanspaces.com/avatars/orange.jpg"
+            src={imglink}
           />
           <Avatar.Fallback delayMs={600}>JD</Avatar.Fallback>
         </Avatar>
@@ -27,9 +31,9 @@ export function CustomAvatar() {
               <Avatar.Fallback delayMs={600}>JD</Avatar.Fallback>
             </Avatar>
             <div className="flex flex-col gap-0">
-              <p className="text-sm leading-5 font-medium">Jane Doe</p>
+              <p className="text-sm leading-5 font-medium">{name}</p>
               <p className="text-xs leading-none text-muted">
-                jane@example.com
+                {email}
               </p>
             </div>
           </div>

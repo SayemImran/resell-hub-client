@@ -1,9 +1,10 @@
+import MyProducts from '@/components/dashboard/sellercomponents/MyProducts';
 import React from 'react';
 
 const Products = () => {
     return (
         <div>
-            This is all products page
+            <MyProducts/>
         </div>
     );
 };

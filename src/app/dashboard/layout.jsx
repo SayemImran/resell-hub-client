@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Sidebar } from "../../components/dashboard/Sidebar";
+import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 const DashboardLayout = ({ children }) => {
   return (
     <div className=" flex h-screen gap-3">
@@ -8,9 +9,9 @@ const DashboardLayout = ({ children }) => {
         <Sidebar />
       </div>
 
-      <div className="w-10/12 flex flex-col gap-5 bg-blue-200">
-        <div className="bg-blue-400">dashboar navbar</div>
-        <div className="bg-blue-700">
+      <div className="w-10/12 flex flex-col gap-5">
+        <DashboardNavbar/>
+        <div className="">
           <main>{children}</main>
         </div>
       </div>

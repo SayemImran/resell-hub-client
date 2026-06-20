@@ -1,5 +1,9 @@
-// dashboard/seller/page.jsx
+import SellerDashboardOverview from "@/components/dashboard/overview/SellerDashboardOverview";
 
 export default function SellerDashboard() {
-  return <div>Seller Dashboard</div>;
+  return(
+    <>
+    <SellerDashboardOverview/>
+    </>
+  );
 }

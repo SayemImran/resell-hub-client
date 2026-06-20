@@ -21,9 +21,10 @@ export default function Navbar() {
   const { data: sessionData } = authClient.useSession();
   const currentuser = sessionData?.user.name;
   const role = sessionData?.user.role.toLowerCase();
-  console.log("current user :",currentuser);
-  console.log("current role :",role);
-  console.log("current id :",sessionData?.user?.id);
+ 
+  //console.log("current user :",currentuser);
+  //console.log("current role :",role);
+  //console.log("current id :",sessionData?.user?.id);
  
   if(pathname.includes('dashboard')){
     return null;

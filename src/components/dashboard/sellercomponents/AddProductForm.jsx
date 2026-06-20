@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Input, TextArea, Select, ListBox, Label } from "@heroui/react";
 import { authClient } from "@/lib/auth-client";
 
@@ -16,16 +16,8 @@ const categories = [
 const conditions = ["Used", "Like New", "Refurbished"];
 
 export default function AddProductForm() {
-
-
-  const { data: sessionData } = authClient.getSession();
-  const seller = sessionData?.user;
-  const sellerId = seller?.id;
-  console.log("seller id : ", sellerId);
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
   const [loading, setLoading] = useState(false);
-
   const [formData, setFormData] = useState({
     title: "",
     imageUrl: "",
@@ -35,6 +27,13 @@ export default function AddProductForm() {
     price: "",
     stock: "",
   });
+
+  const { data: sessionData, isLoading } = authClient.useSession();
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  const seller = sessionData?.user;
+  console.log("Current seller", seller);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({
@@ -65,7 +64,9 @@ export default function AddProductForm() {
           stock: Number(formData.stock),
           status: "available",
           seller_info: {
-            seller_id: "",
+            seller_id: seller?.id || "",
+            name: seller?.name || "",
+            email: seller?.email || "",
           },
         }),
       });
@@ -116,7 +117,7 @@ export default function AddProductForm() {
               placeholder="MacBook Pro M2 16GB"
               value={formData.title}
               onChange={(e) => handleChange("title", e.target.value)}
-              isRequired
+              required
             />
 
             <Input
@@ -135,21 +136,21 @@ export default function AddProductForm() {
 
             {/* Category & Condition */}
             <div className="grid gap-5 md:grid-cols-2">
-              <Select className="w-full" placeholder="Select Category">
+              <Select
+                className="w-full"
+                placeholder="Select Category"
+                name="category" // Added name attribute for form submission stability
+                selectedKey={formData.category || null}
+                onSelectionChange={(value) => handleChange("category", value)}
+              >
                 <Label>Category</Label>
-
                 <Select.Trigger>
                   <Select.Value />
                   <Select.Indicator />
                 </Select.Trigger>
 
                 <Select.Popover>
-                  <ListBox
-                    onSelectionChange={(keys) => {
-                      const value = Array.from(keys)[0];
-                      handleChange("category", value || "");
-                    }}
-                  >
+                  <ListBox>
                     {categories.map((category) => (
                       <ListBox.Item
                         key={category}
@@ -157,28 +158,28 @@ export default function AddProductForm() {
                         textValue={category}
                       >
                         {category}
-                        <ListBox.ItemIndicator />
                       </ListBox.Item>
                     ))}
                   </ListBox>
                 </Select.Popover>
               </Select>
 
-              <Select className="w-full" placeholder="Select Condition">
+              {/* --- CONDITION SELECT --- */}
+              <Select
+                className="w-full"
+                placeholder="Select Condition"
+                name="condition" // Added name attribute for form submission stability
+                selectedKey={formData.condition || null}
+                onSelectionChange={(value) => handleChange("condition", value)}
+              >
                 <Label>Condition</Label>
-
                 <Select.Trigger>
                   <Select.Value />
                   <Select.Indicator />
                 </Select.Trigger>
 
                 <Select.Popover>
-                  <ListBox
-                    onSelectionChange={(keys) => {
-                      const value = Array.from(keys)[0];
-                      handleChange("condition", value || "");
-                    }}
-                  >
+                  <ListBox>
                     {conditions.map((condition) => (
                       <ListBox.Item
                         key={condition}
@@ -186,7 +187,6 @@ export default function AddProductForm() {
                         textValue={condition}
                       >
                         {condition}
-                        <ListBox.ItemIndicator />
                       </ListBox.Item>
                     ))}
                   </ListBox>

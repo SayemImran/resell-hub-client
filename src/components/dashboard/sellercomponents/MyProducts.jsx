@@ -37,7 +37,7 @@ export default function MyProducts() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
 
         if (!res.ok) {
           throw new Error(`Request failed with status ${res.status}`);
@@ -76,7 +76,7 @@ export default function MyProducts() {
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
         method: "DELETE",
       });
 

@@ -1,45 +1,68 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
-import { Input, Button } from "@heroui/react";
+import { Input, Button, Spinner } from "@heroui/react";
 
-import { Magnifier, Pencil, TrashBin, Boxes3 } from "@gravity-ui/icons";
-
-const demoProducts = [
-  {
-    _id: "1",
-    title: "MacBook Pro M2",
-    category: "Electronics",
-    price: 1200,
-    stock: 5,
-    image: "https://images.unsplash.com/photo-1517336714739-489689fd1ca8",
-  },
-  {
-    _id: "2",
-    title: "Nike Air Max",
-    category: "Fashion",
-    price: 150,
-    stock: 12,
-    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff",
-  },
-  {
-    _id: "3",
-    title: "Gaming Chair",
-    category: "Furniture",
-    price: 280,
-    stock: 3,
-    image: "https://images.unsplash.com/photo-1592078615290-033ee584e267",
-  },
-];
+import {
+  Magnifier,
+  Pencil,
+  TrashBin,
+  Boxes3,
+  CloudGear,
+} from "@gravity-ui/icons";
+import { authClient } from "@/lib/auth-client";
 
 export default function MyProducts() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
 
+  // Load current user — no early return here, just compute values
+  const { data: sessionData, isLoading: sessionLoading } =
+    authClient.useSession();
+  const seller = sessionData?.user;
+  const CURRENT_SELLER_ID = seller?.id;
+
+  useEffect(() => {
+    // Wait until the session has resolved AND we have an id
+    if (sessionLoading || !CURRENT_SELLER_ID) return;
+
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await fetch("http://localhost:5000/api/products");
+
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`);
+        }
+
+        const data = await res.json();
+
+        const myProducts = data.data.filter(
+          (product) => product.seller_info?.seller_id === CURRENT_SELLER_ID,
+        );
+
+        setProducts(myProducts);
+      } catch (err) {
+        console.error("Failed to fetch products:", err);
+        setError("Could not load your products. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [sessionLoading, CURRENT_SELLER_ID]); // re-run when these change
+
   const filteredProducts = useMemo(() => {
-    return demoProducts.filter((product) => {
+    return products.filter((product) => {
       const matchesSearch = product.title
         .toLowerCase()
         .includes(search.toLowerCase());
@@ -49,11 +72,28 @@ export default function MyProducts() {
 
       return matchesSearch && matchesCategory;
     });
-  }, [search, category]);
+  }, [products, search, category]);
 
-  const handleDelete = (id) => {
-    console.log("Delete Product:", id);
+  const handleDelete = async (id) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/products/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        throw new Error(`Delete failed with status ${res.status}`);
+      }
+
+      setProducts((prev) => prev.filter((product) => product._id !== id));
+    } catch (err) {
+      console.error("Failed to delete product:", err);
+    }
   };
+
+  // Loading check now happens in JSX, AFTER all hooks have run
+  if (sessionLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <section className="space-y-8">
@@ -114,108 +154,151 @@ export default function MyProducts() {
         </div>
       </div>
 
+      {/* Loading state */}
+      {loading && (
+        <div className="flex items-center justify-center p-16">
+          <Spinner />
+        </div>
+      )}
+
+      {/* Error state */}
+      {!loading && error && (
+        <div
+          className="
+            flex
+            flex-col
+            items-center
+            justify-center
+            rounded-3xl
+            border border-dashed
+            border-danger/30
+            p-16
+            text-center
+          "
+        >
+          <p className="text-danger">{error}</p>
+        </div>
+      )}
+
       {/* Products */}
-      <div
-        className="
-          grid
-          gap-6
-          md:grid-cols-2
-          xl:grid-cols-3
-        "
-      >
-        {filteredProducts.map((product) => (
-          <div
-            key={product._id}
-            className="
-              overflow-hidden
-              rounded-3xl
-              border border-white/20
-              bg-white/10
-              backdrop-blur-xl
-              shadow-xl
-              transition-all
-              duration-300
-              hover:-translate-y-1
-            "
-          >
-            {/* Image */}
-            <div className="aspect-video">
-              <img
-                src={product.image}
-                alt={product.title}
-                className="
-                  h-full
-                  w-full
-                  object-cover
-                "
-              />
-            </div>
-
-            {/* Content */}
-            <div className="space-y-4 p-5">
-              <div>
-                <h3 className="text-lg font-semibold">{product.title}</h3>
-
-                <p className="text-sm text-default-500">{product.category}</p>
-              </div>
-
-              {/* Stats */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-default-500">Price</p>
-
-                  <p className="font-bold text-primary">${product.price}</p>
-                </div>
-
-                <div>
-                  <p className="text-xs text-default-500">Stock</p>
-
-                  <p className="font-semibold">{product.stock}</p>
-                </div>
-              </div>
-
-              {/* Status */}
-              <div>
-                <span
+      {!loading && !error && (
+        <div
+          className="
+            grid
+            gap-6
+            md:grid-cols-2
+            xl:grid-cols-3
+          "
+        >
+          {filteredProducts.map((product) => (
+            <div
+              key={product._id}
+              className="
+                overflow-hidden
+                rounded-3xl
+                border border-white/20
+                bg-white/10
+                backdrop-blur-xl
+                shadow-xl
+                transition-all
+                duration-300
+                hover:-translate-y-1
+              "
+            >
+              {/* Image */}
+              <div className="aspect-video">
+                <img
+                  src={product.imageUrl}
+                  alt={product.title}
                   className="
-                    rounded-full
-                    bg-green-500/10
-                    px-3
-                    py-1
-                    text-xs
-                    font-medium
-                    text-green-600
+                    h-full
+                    w-full
+                    object-cover
                   "
-                >
-                  Active
-                </span>
+                />
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-3">
-                <Button size="sm" variant="flat" className="flex-1">
-                  <Pencil width={16} />
-                  Edit
-                </Button>
+              {/* Content */}
+              <div className="space-y-4 p-5">
+                <div>
+                  <h3 className="text-lg font-semibold">{product.title}</h3>
 
-                <Button
-                  size="sm"
-                  color="danger"
-                  variant="flat"
-                  className="flex-1"
-                  onClick={() => handleDelete(product._id)}
-                >
-                  <TrashBin width={16} />
-                  Delete
-                </Button>
+                  <p className="text-sm text-default-500">
+                    {product.category} · {product.condition}
+                  </p>
+                </div>
+
+                {/* Stats */}
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs text-default-500">Price</p>
+
+                    <p className="font-bold text-primary">${product.price}</p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs text-default-500">Stock</p>
+
+                    <p className="font-semibold">{product.stock}</p>
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div>
+                  <span
+                    className={`
+                      rounded-full
+                      px-3
+                      py-1
+                      text-xs
+                      font-medium
+                      ${
+                        product.status === "available"
+                          ? "bg-green-500/10 text-green-600"
+                          : "bg-default-500/10 text-default-500"
+                      }
+                    `}
+                  >
+                    {product.status === "available" ? "Active" : product.status}
+                  </span>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <Link
+                    href={`/dashboard/seller/products/${product._id}`}
+                    className="flex-1"
+                  >
+                    <Button size="sm" variant="flat" className="w-full">
+                      <Pencil width={16} />
+                      view
+                    </Button>
+                  </Link>
+                      <Link href={`/dashboard/seller/products/edit/${product._id}`}>
+                      <Button size="sm" variant="flat" className="w-full">
+                      <Pencil width={16} />
+                      Edit
+                    </Button>
+                      </Link>
+                  <Button
+                    size="sm"
+                    color="danger"
+                    variant="flat"
+                    className="flex-1"
+                    onClick={() => handleDelete(product._id)}
+                  >
+                    <TrashBin width={16} />
+                    Delete
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Empty State */}
-      {filteredProducts.length === 0 && (
+      {!loading && !error && filteredProducts.length === 0 && (
         <div
           className="
             flex

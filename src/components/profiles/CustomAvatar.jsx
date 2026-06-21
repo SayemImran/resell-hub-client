@@ -63,8 +63,7 @@ export function CustomAvatar() {
             variant="danger"
             onClick={async () => {
               await signOut();
-              router.push("/auth/login");
-              router.refresh();
+              window.location.href = "/auth/login";
             }}
           >
             <div className="flex w-full items-center justify-between gap-2">

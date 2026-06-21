@@ -25,25 +25,20 @@ export default function LoginForm() {
       email: "",
       password: "",
     },
-    mode: "onChange", 
+    mode: "onChange",
   });
-
   const onSubmit = async (data) => {
-    const {error} = await signIn.email({
+    const { error } = await signIn.email({
       email: data.email,
       password: data.password,
     });
 
-    if(!error){
+    if (!error) {
       toast.success("Logged in successfully!");
-      router.push(`/`); 
-      router.refresh();
-    }else{
+      window.location.href = "/"; // full reload — guarantees fresh cookie + fresh session everywhere
+    } else {
       toast.error(error.message || "Failed to log in. Please try again.");
     }
-    console.log("Login Form Submitted Successfully:", data);
-    console.log("Sign In Result:", { error });
-    
   };
 
   return (

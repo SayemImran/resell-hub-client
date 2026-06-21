@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 
 const ProfileInfo = ({ user }) => {
+
+    console.log(user);
   if (!user) return null;
 
   const { name, email, emailVerified, createdAt, role, profile } = user;
@@ -79,7 +81,7 @@ const ProfileInfo = ({ user }) => {
         </p>
 
         {/* Update profile button */}
-        <Link href="/profile/edit" className="mt-8 w-full sm:w-auto">
+        <Link href={`/profile/edit/${user.id}`} className="mt-8 w-full sm:w-auto">
           <Button color="primary" className="w-full sm:w-auto sm:px-10">
             Update Profile
           </Button>

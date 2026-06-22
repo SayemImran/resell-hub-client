@@ -8,13 +8,14 @@ import { authClient } from "@/lib/auth-client";
 import ProductCategoryCard from "@/components/products/ProductCategoryCard";
 
 const categories = ["All", "Electronics", "Accessories", "Sports", "Books"];
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function CategoryPage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All");
-  const [wishlist, setWishlist] = useState(new Set());
+  const [wishlistIds, setWishlistIds] = useState(new Set());
 
   // No early return before this — keep hook order stable
   const { data: sessionData } = authClient.useSession();
@@ -26,7 +27,7 @@ export default function CategoryPage() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${API_URL}/api/products`);
 
         if (!res.ok) {
           throw new Error(`Request failed with status ${res.status}`);
@@ -45,24 +46,30 @@ export default function CategoryPage() {
     fetchProducts();
   }, []);
 
+  // Fetch the buyer's existing wishlist once we know who they are
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    const fetchWishlist = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/wishlist/${currentUserId}`);
+
+        if (!res.ok) return; // fail quietly — wishlist hydration isn't critical path
+
+        const { data } = await res.json();
+        setWishlistIds(new Set(data.map((item) => item.productId)));
+      } catch (err) {
+        console.error("Failed to fetch wishlist:", err);
+      }
+    };
+
+    fetchWishlist();
+  }, [currentUserId]);
+
   const filteredProducts = useMemo(() => {
     if (activeCategory === "All") return products;
     return products.filter((product) => product.category === activeCategory);
   }, [products, activeCategory]);
-
-  const toggleWishlist = (id) => {
-    setWishlist((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-        toast("Removed from wishlist");
-      } else {
-        next.add(id);
-        toast.success("Added to wishlist");
-      }
-      return next;
-    });
-  };
 
   const handleOrderNow = (product) => {
     console.log("Order requested for:", product);
@@ -130,10 +137,8 @@ export default function CategoryPage() {
             <ProductCategoryCard
               key={product._id}
               product={product}
-              isWishlisted={wishlist.has(product._id)}
-              onToggleWishlist={toggleWishlist}
+              initialIsWishlisted={wishlistIds.has(product._id)}
               onOrderNow={handleOrderNow}
-              isOwner={product.seller_info?.seller_id === currentUserId}
             />
           ))}
         </div>

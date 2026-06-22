@@ -8,7 +8,7 @@ const ProductDetailsPage = async ({ params }) => {
   const { id } = await params;
 
   const [productRes, session] = await Promise.all([
-    fetch(`http://localhost:5000/api/products/${id}`, { cache: "no-store" }),
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, { cache: "no-store" }),
     auth.api.getSession({ headers: await headers() }),
   ]);
 

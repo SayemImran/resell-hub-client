@@ -4,13 +4,7 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 import { Heart } from "@gravity-ui/icons";
 
-const ProductCategoryCard = ({
-  product,
-  isWishlisted,
-  onToggleWishlist,
-  onOrderNow,
-  isOwner,
-}) => {
+const ProductCategoryCard = ({ product, isWishlisted, onToggleWishlist, onOrderNow }) => {
   return (
     <div
       className="
@@ -33,59 +27,35 @@ const ProductCategoryCard = ({
           className="h-full w-full object-cover"
         />
 
-        {!isOwner && (
-          <button
-            onClick={() => onToggleWishlist(product._id)}
-            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-            className="
-              absolute
-              right-2.5
-              top-2.5
-              flex
-              h-8
-              w-8
-              items-center
-              justify-center
-              rounded-full
-              bg-white/80
-              backdrop-blur-md
-              transition-colors
-              hover:bg-white
-              sm:right-3
-              sm:top-3
-              sm:h-9
-              sm:w-9
-            "
-          >
-            <Heart
-              width={16}
-              className={isWishlisted ? "text-danger" : "text-default-500"}
-              fill={isWishlisted ? "currentColor" : "none"}
-            />
-          </button>
-        )}
-
-        {isOwner && (
-          <span
-            className="
-              absolute
-              right-2.5
-              top-2.5
-              rounded-full
-              bg-primary/90
-              px-3
-              py-1
-              text-xs
-              font-medium
-              text-white
-              backdrop-blur-md
-              sm:right-3
-              sm:top-3
-            "
-          >
-            Your Listing
-          </span>
-        )}
+        <button
+          onClick={() => onToggleWishlist(product._id)}
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          className="
+            absolute
+            right-2.5
+            top-2.5
+            flex
+            h-8
+            w-8
+            items-center
+            justify-center
+            rounded-full
+            bg-white/80
+            backdrop-blur-md
+            transition-colors
+            hover:bg-white
+            sm:right-3
+            sm:top-3
+            sm:h-9
+            sm:w-9
+          "
+        >
+          <Heart
+            width={16}
+            className={isWishlisted ? "text-danger" : "text-default-500"}
+            fill={isWishlisted ? "currentColor" : "none"}
+          />
+        </button>
       </div>
 
       {/* Content */}
@@ -111,23 +81,21 @@ const ProductCategoryCard = ({
 
         {/* Actions */}
         <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
-          <Link href={`/products/${product._id}`} className={isOwner ? "w-full" : "sm:flex-1"}>
+          <Link href={`/products/${product._id}`} className="sm:flex-1">
             <Button size="sm" variant="flat" className="w-full">
               Details
             </Button>
           </Link>
 
-          {!isOwner && (
-            <Button
-              size="sm"
-              color="primary"
-              className="sm:flex-1"
-              onClick={() => onOrderNow(product)}
-              isDisabled={product.stock === 0}
-            >
-              {product.stock === 0 ? "Out of Stock" : "Order Now"}
-            </Button>
-          )}
+          <Button
+            size="sm"
+            color="primary"
+            className="sm:flex-1"
+            onClick={() => onOrderNow(product)}
+            isDisabled={product.stock === 0}
+          >
+            {product.stock === 0 ? "Out of Stock" : "Order Now"}
+          </Button>
         </div>
       </div>
     </div>

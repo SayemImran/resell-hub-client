@@ -119,7 +119,7 @@ const ProductCard = ({ product }) => {
           className="flex-1 font-medium"
           isDisabled={stock <= 0}
         >
-          Add to Cart
+          Order now
         </Button>
 
         <Button variant="bordered">Details</Button>

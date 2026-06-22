@@ -4,7 +4,13 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 import { Heart } from "@gravity-ui/icons";
 
-const ProductCategoryCard = ({ product, isWishlisted, onToggleWishlist, onOrderNow }) => {
+const ProductCategoryCard = ({
+  product,
+  isWishlisted,
+  onToggleWishlist,
+  onOrderNow,
+  isOwner,
+}) => {
   return (
     <div
       className="
@@ -27,38 +33,66 @@ const ProductCategoryCard = ({ product, isWishlisted, onToggleWishlist, onOrderN
           className="h-full w-full object-cover"
         />
 
-        <button
-          onClick={() => onToggleWishlist(product._id)}
-          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-          className="
-            absolute
-            right-3
-            top-3
-            flex
-            h-9
-            w-9
-            items-center
-            justify-center
-            rounded-full
-            bg-white/80
-            backdrop-blur-md
-            transition-colors
-            hover:bg-white
-          "
-        >
-          <Heart
-            width={18}
-            className={isWishlisted ? "text-danger" : "text-default-500"}
-            fill={isWishlisted ? "currentColor" : "none"}
-          />
-        </button>
+        {!isOwner && (
+          <button
+            onClick={() => onToggleWishlist(product._id)}
+            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            className="
+              absolute
+              right-2.5
+              top-2.5
+              flex
+              h-8
+              w-8
+              items-center
+              justify-center
+              rounded-full
+              bg-white/80
+              backdrop-blur-md
+              transition-colors
+              hover:bg-white
+              sm:right-3
+              sm:top-3
+              sm:h-9
+              sm:w-9
+            "
+          >
+            <Heart
+              width={16}
+              className={isWishlisted ? "text-danger" : "text-default-500"}
+              fill={isWishlisted ? "currentColor" : "none"}
+            />
+          </button>
+        )}
+
+        {isOwner && (
+          <span
+            className="
+              absolute
+              right-2.5
+              top-2.5
+              rounded-full
+              bg-primary/90
+              px-3
+              py-1
+              text-xs
+              font-medium
+              text-white
+              backdrop-blur-md
+              sm:right-3
+              sm:top-3
+            "
+          >
+            Your Listing
+          </span>
+        )}
       </div>
 
       {/* Content */}
-      <div className="space-y-4 p-5">
+      <div className="space-y-3 p-4 sm:space-y-4 sm:p-5">
         <div>
-          <h3 className="text-lg font-semibold">{product.title}</h3>
-          <p className="text-sm text-default-500">
+          <h3 className="text-base font-semibold sm:text-lg">{product.title}</h3>
+          <p className="text-xs text-default-500 sm:text-sm">
             {product.category} · {product.condition}
           </p>
         </div>
@@ -76,22 +110,24 @@ const ProductCategoryCard = ({ product, isWishlisted, onToggleWishlist, onOrderN
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3">
-          <Link href={`/products/${product._id}`} className="flex-1">
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+          <Link href={`/products/${product._id}`} className={isOwner ? "w-full" : "sm:flex-1"}>
             <Button size="sm" variant="flat" className="w-full">
               Details
             </Button>
           </Link>
 
-          <Button
-            size="sm"
-            color="primary"
-            className="flex-1"
-            onClick={() => onOrderNow(product)}
-            isDisabled={product.stock === 0}
-          >
-            {product.stock === 0 ? "Out of Stock" : "Order Now"}
-          </Button>
+          {!isOwner && (
+            <Button
+              size="sm"
+              color="primary"
+              className="sm:flex-1"
+              onClick={() => onOrderNow(product)}
+              isDisabled={product.stock === 0}
+            >
+              {product.stock === 0 ? "Out of Stock" : "Order Now"}
+            </Button>
+          )}
         </div>
       </div>
     </div>

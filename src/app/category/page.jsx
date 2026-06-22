@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Spinner } from "@heroui/react";
 import { Boxes3 } from "@gravity-ui/icons";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
 import ProductCategoryCard from "@/components/products/ProductCategoryCard";
 
 const categories = ["All", "Electronics", "Accessories", "Sports", "Books"];
@@ -14,6 +15,10 @@ export default function CategoryPage() {
   const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState("All");
   const [wishlist, setWishlist] = useState(new Set());
+
+  // No early return before this — keep hook order stable
+  const { data: sessionData } = authClient.useSession();
+  const currentUserId = sessionData?.user?.id;
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -74,7 +79,7 @@ export default function CategoryPage() {
         </p>
       </div>
 
-      {/* Category filter - horizontally scrollable on small screens */}
+      {/* Category filter */}
       <div className="-mx-4 overflow-x-auto px-4 sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0">
         <div className="flex w-max gap-2 sm:gap-3 lg:w-auto lg:flex-wrap">
           {categories.map((cat) => (
@@ -128,6 +133,7 @@ export default function CategoryPage() {
               isWishlisted={wishlist.has(product._id)}
               onToggleWishlist={toggleWishlist}
               onOrderNow={handleOrderNow}
+              isOwner={product.seller_info?.seller_id === currentUserId}
             />
           ))}
         </div>

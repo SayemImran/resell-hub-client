@@ -8,22 +8,30 @@ const db = client.db("resell_hub_db");
 
 export const auth = betterAuth({
   database: mongodbAdapter(db, {
-    client
+    client,
   }),
-  emailAndPassword:{
-    enabled:true,
+  emailAndPassword: {
+    enabled: true,
   },
-  user:{
-    additionalFields:{
-      role:{
-        type:"string",
-        defaultValue:"Buyer",
-        required:true,
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "Buyer",
+        required: true,
       },
-      profile:{
-        type:"string",
+      profile: {
+        type: "string",
         input: true,
-      }
-    }
-  }
+      },
+      phone: {
+        type: "string",
+        required: false,
+      },
+      address: {
+        type: "string",
+        required: false,
+      },
+    },
+  },
 });

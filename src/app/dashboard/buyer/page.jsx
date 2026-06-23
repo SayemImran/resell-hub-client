@@ -1,57 +1,170 @@
-import Header from "@/components/dashboard/Header";
-import StatsCards from "@/components/dashboard/StatsCards";
-import OrdersTable from "@/components/dashboard/OrdersTable";
-import WishlistPreview from "@/components/dashboard/WishlistPreview";
-import CurrentStatus from "@/components/dashboard/CurrentStatus";
-import RecentPayments from "@/components/dashboard/RecentPayments";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { Boxes3, Heart, BriefcaseFill, ShoppingCart } from "@gravity-ui/icons";
+import { Chip } from "@heroui/react";
+import OrderCard from "@/components/orders/OrderCard";
 
-export default function BuyerDashboardPage() {
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <Header />
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold">Welcome back, Alex</h1>
-            <p className="text-default-500">
-              Today is Friday, June 19, 2026
-            </p>
-          </div>
+const paymentStatusColor = {
+  paid: "success",
+  pending: "warning",
+  failed: "danger",
+};
 
-          <div className="flex gap-3">
-            <button className="px-4 py-2 bg-white rounded-xl border">
-              Overview
-            </button>
+const BuyerOverviewPage = async () => {
+  const session = await auth.api.getSession({ headers: await headers() });
 
-            <button className="px-4 py-2 bg-white rounded-xl border">
-              Reports
-            </button>
-          </div>
-        </div>
-
-        <StatsCards />
-
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-8">
-            <OrdersTable />
-          </div>
-
-          <div className="col-span-4">
-            <WishlistPreview />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-6">
-            <CurrentStatus />
-          </div>
-
-          <div className="col-span-6">
-            <RecentPayments />
-          </div>
-        </div>
+  if (!session?.user) {
+    return (
+      <div className="p-16 text-center text-default-500">
+        Please log in to view your overview.
       </div>
-    </div>
+    );
+  }
+
+  const userId = session.user.id;
+
+  const [ordersRes, wishlistRes] = await Promise.all([
+    fetch(`${API_URL}/api/orders/buyer/${userId}`, { cache: "no-store" }),
+    fetch(`${API_URL}/api/wishlist/${userId}`, { cache: "no-store" }),
+  ]);
+
+  const { data: orders = [] } = ordersRes.ok ? await ordersRes.json() : { data: [] };
+  const { data: wishlistItems = [] } = wishlistRes.ok ? await wishlistRes.json() : { data: [] };
+
+  // Derived stats
+  const totalOrders = orders.length;
+  const wishlistCount = wishlistItems.length;
+
+  const totalPurchases = orders
+    .filter((order) => order.paymentStatus === "paid")
+    .reduce((sum, order) => sum + order.totalAmount, 0);
+
+  const recentOrders = orders.slice(0, 5);
+
+  const paymentHistory = orders.map((order) => ({
+    _id: order._id,
+    productTitle: order.productTitle,
+    totalAmount: order.totalAmount,
+    paymentStatus: order.paymentStatus,
+    createdAt: order.createdAt,
+  }));
+
+  const stats = [
+    {
+      label: "Total Orders",
+      value: totalOrders,
+      icon: ShoppingCart,
+    },
+    {
+      label: "Wishlist Items",
+      value: wishlistCount,
+      icon: Heart,
+    },
+    {
+      label: "Total Purchases",
+      value: `$${totalPurchases.toFixed(2)}`,
+      icon: BriefcaseFill,
+    },
+  ];
+
+  return (
+    <section className="mx-auto max-w-6xl space-y-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold sm:text-3xl">
+          Welcome back, {session.user.name}
+        </h1>
+        <p className="mt-2 text-sm text-default-500 sm:text-base">
+          Here's an overview of your activity.
+        </p>
+      </div>
+
+      {/* Stat cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+        {stats.map(({ label, value, icon: Icon }) => (
+          <div
+            key={label}
+            className="flex items-center gap-4 rounded-3xl border border-white/20 bg-white/10 p-5 backdrop-blur-xl shadow-xl"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10">
+              <Icon width={22} className="text-primary" />
+            </div>
+            <div>
+              <p className="text-xs text-default-500">{label}</p>
+              <p className="text-xl font-bold">{value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Recent orders */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold sm:text-xl">Recent Orders</h2>
+
+        {recentOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/20 p-10 text-center">
+            <Boxes3 width={36} height={36} className="opacity-40" />
+            <p className="mt-3 text-sm text-default-500">No orders yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {recentOrders.map((order) => (
+              <OrderCard key={order._id} order={order} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Payment history */}
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold sm:text-xl">Payment History</h2>
+
+        {paymentHistory.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/20 p-10 text-center">
+            <BriefcaseFill width={36} height={36} className="opacity-40" />
+            <p className="mt-3 text-sm text-default-500">No payment history yet.</p>
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-xl">
+            <div className="divide-y divide-white/10">
+              {paymentHistory.map((payment) => (
+                <div
+                  key={payment._id}
+                  className="flex items-center justify-between gap-4 p-4 sm:p-5"
+                >
+                  <div>
+                    <p className="text-sm font-medium sm:text-base">
+                      {payment.productTitle}
+                    </p>
+                    <p className="text-xs text-default-500">
+                      {new Date(payment.createdAt).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <p className="font-semibold">${payment.totalAmount}</p>
+                    <Chip
+                      size="sm"
+                      variant="flat"
+                      color={paymentStatusColor[payment.paymentStatus] || "default"}
+                    >
+                      {payment.paymentStatus}
+                    </Chip>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
   );
-}
+};
+
+export default BuyerOverviewPage;

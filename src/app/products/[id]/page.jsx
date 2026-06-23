@@ -3,6 +3,7 @@ import { ArrowLeft } from "@gravity-ui/icons";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import CategoryProductDetailsCard from "@/components/products/CategoryProductDetailsCard";
+import ReviewsSection from "@/components/products/ReviewSection";
 
 const ProductDetailsPage = async ({ params }) => {
   const { id } = await params;
@@ -33,6 +34,7 @@ const ProductDetailsPage = async ({ params }) => {
       </Link>
 
       <CategoryProductDetailsCard product={product} currentUser={session?.user} />
+      <ReviewsSection productId={id}/>
     </section>
   );
 };

@@ -23,6 +23,8 @@ export default function EditProfileForm({ user }) {
     defaultValues: {
       name: user.name,
       profile: user.profile,
+      phone: user.phone || "",
+      address: user.address || "",
     },
     mode: "onChange",
   });
@@ -32,11 +34,20 @@ export default function EditProfileForm({ user }) {
       const { error } = await authClient.updateUser({
         name: data.name,
         image: data.profile,
+        phone: data.phone,
+        address: data.address,
       });
 
       if (error) {
         throw new Error(error.message);
       }
+
+      // Keep embedded seller_info in products collection in sync
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/sync-seller/${user.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: data.name, email: user.email }),
+      });
 
       toast.success("Profile updated successfully!");
       router.push("/profile");
@@ -53,6 +64,8 @@ export default function EditProfileForm({ user }) {
       noValidate
       className="space-y-5 rounded-3xl border border-white/20 bg-white/10 p-8 backdrop-blur-xl shadow-xl"
     >
+      <h2 className="text-lg font-semibold">Profile Information</h2>
+
       {/* Name */}
       <Controller
         name="name"
@@ -64,9 +77,7 @@ export default function EditProfileForm({ user }) {
             <InputGroup>
               <InputGroup.Input {...field} className="w-full" />
             </InputGroup>
-            {fieldState.error && (
-              <FieldError>{fieldState.error.message}</FieldError>
-            )}
+            {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
           </TextField>
         )}
       />
@@ -82,9 +93,45 @@ export default function EditProfileForm({ user }) {
             <InputGroup>
               <InputGroup.Input {...field} className="w-full" />
             </InputGroup>
-            {fieldState.error && (
-              <FieldError>{fieldState.error.message}</FieldError>
-            )}
+            {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+          </TextField>
+        )}
+      />
+
+      {/* Phone */}
+      <Controller
+        name="phone"
+        control={control}
+        rules={{
+          required: "Phone number is required",
+          pattern: {
+            value: /^[0-9+\-\s()]{6,20}$/,
+            message: "Enter a valid phone number",
+          },
+        }}
+        render={({ field, fieldState }) => (
+          <TextField className="w-full" isInvalid={fieldState.invalid}>
+            <Label>Phone Number</Label>
+            <InputGroup>
+              <InputGroup.Input {...field} type="tel" placeholder="+880 1XXXXXXXXX" className="w-full" />
+            </InputGroup>
+            {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
+          </TextField>
+        )}
+      />
+
+      {/* Address */}
+      <Controller
+        name="address"
+        control={control}
+        rules={{ required: "Address is required" }}
+        render={({ field, fieldState }) => (
+          <TextField className="w-full" isInvalid={fieldState.invalid}>
+            <Label>Address</Label>
+            <InputGroup>
+              <InputGroup.Input {...field} placeholder="Street, City, Country" className="w-full" />
+            </InputGroup>
+            {fieldState.error && <FieldError>{fieldState.error.message}</FieldError>}
           </TextField>
         )}
       />

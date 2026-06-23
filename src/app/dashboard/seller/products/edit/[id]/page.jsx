@@ -3,7 +3,7 @@ import EditProductForm from "@/components/products/EditProductForm";
 const EditPage = async ({ params }) => {
   const { id } = await params;
 
-  const res = await fetch(`${processFetch.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
     cache: "no-store",
   });
 

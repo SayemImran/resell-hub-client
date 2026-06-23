@@ -47,7 +47,7 @@ export default function EditProductForm({ product }) {
   const onSubmit = async (data) => {
     try {
       const res = await fetch(
-        `${processFetch.env.NEXT_PUBLIC_API_URL}/api/products/edit/${product._id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/products/edit/${product._id}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },

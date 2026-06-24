@@ -27,7 +27,7 @@ export default function CategoryPage() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch(`${API_URL}/api/products`);
+        const res = await fetch(`${API_URL}/api/products?approvalStatus=approved`);
 
         if (!res.ok) {
           throw new Error(`Request failed with status ${res.status}`);

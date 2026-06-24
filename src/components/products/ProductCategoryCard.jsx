@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Button } from "@heroui/react";
-import { Heart } from "@gravity-ui/icons";
+import { Button, Chip } from "@heroui/react";
+import { Heart, CircleCheck } from "@gravity-ui/icons";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 
@@ -25,7 +25,6 @@ const ProductCategoryCard = ({ product, initialIsWishlisted = false, onOrderNow 
 
     const wasWishlisted = isWishlisted;
 
-    // Optimistic UI update
     setIsWishlisted(!wasWishlisted);
     setTogglingWishlist(true);
 
@@ -54,7 +53,7 @@ const ProductCategoryCard = ({ product, initialIsWishlisted = false, onOrderNow 
     } catch (err) {
       console.error("Wishlist toggle failed:", err);
       toast.error("Something went wrong. Please try again.");
-      setIsWishlisted(wasWishlisted); // roll back on failure
+      setIsWishlisted(wasWishlisted);
     } finally {
       setTogglingWishlist(false);
     }
@@ -81,6 +80,19 @@ const ProductCategoryCard = ({ product, initialIsWishlisted = false, onOrderNow 
           alt={product.title}
           className="h-full w-full object-cover"
         />
+
+        {/* Approved badge */}
+        {product.approvalStatus === "approved" && (
+          <Chip
+            size="sm"
+            color="success"
+            variant="flat"
+            startcontent={<CircleCheck width={14} />}
+            className="absolute left-2.5 top-2.5 backdrop-blur-md sm:left-3 sm:top-3"
+          >
+            Approved
+          </Chip>
+        )}
 
         {!isOwner && (
           <button

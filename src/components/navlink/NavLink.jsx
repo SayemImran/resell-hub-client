@@ -7,7 +7,7 @@ export default function NavLink({
   href,
   children,
   className = "",
-  startContent,
+  startcontent,
   endContent,
   ...props
 }) {
@@ -48,14 +48,14 @@ export default function NavLink({
       `}
       {...props}
     >
-      {startContent && (
+      {startcontent && (
         <span
           className={`
             flex items-center transition-transform duration-300
             ${isActive ? "scale-110" : "group-hover:scale-105"}
           `}
         >
-          {startContent}
+          {startcontent}
         </span>
       )}
 

@@ -28,43 +28,64 @@ const CategoryProductDetailsCard = ({ product, currentUser }) => {
   const increment = () => setQuantity((q) => Math.min(q + 1, stock));
   const decrement = () => setQuantity((q) => Math.max(q - 1, 1));
 
-  const handleOrder = async () => {
-    if (!currentUser) {
-      toast.error("Please log in to place an order.");
-      return;
+const handleOrder = async () => {
+  if (!currentUser) {
+    toast.error("Please log in to place an order.");
+    return;
+  }
+
+  try {
+    setPlacingOrder(true);
+
+    // Step 1: create the order in MongoDB via Express
+    const orderRes = await fetch("http://localhost:5000/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        buyerInfo: {
+          userId: currentUser.id,
+          name: currentUser.name,
+          email: currentUser.email,
+        },
+        productId: _id,
+        quantity,
+      }),
+    });
+
+    const orderData = await orderRes.json();
+
+    if (!orderRes.ok) {
+      throw new Error(orderData.message || "Failed to create order");
     }
 
-    try {
-      setPlacingOrder(true);
+    // Step 2: create the Stripe Checkout Session via the Next.js route
+    const checkoutRes = await fetch("/api/checkout_sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId: orderData.data._id,
+        productId: _id,
+        productTitle: title,
+        productImage: imageUrl,
+        price,
+        quantity,
+      }),
+    });
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          buyerInfo: {
-            userId: currentUser.id,
-            name: currentUser.name,
-            email: currentUser.email,
-          },
-          productId: _id,
-          quantity,
-        }),
-      });
+    const checkoutData = await checkoutRes.json();
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to place order");
-      }
-
-      toast.success("Order placed successfully!");
-    } catch (err) {
-      console.error("Failed to place order:", err);
-      toast.error(err.message || "Failed to place order. Please try again.");
-    } finally {
-      setPlacingOrder(false);
+    if (!checkoutRes.ok) {
+      throw new Error(checkoutData.error || "Failed to start checkout");
     }
-  };
+
+    // Step 3: send the buyer to Stripe's hosted checkout page
+    window.location.href = checkoutData.url;
+  } catch (err) {
+    console.error("Failed to place order:", err);
+    toast.error(err.message || "Failed to place order. Please try again.");
+    setPlacingOrder(false);
+  }
+};
 
   return (
     <div className="overflow-hidden rounded-3xl border border-white/20 bg-white/10 backdrop-blur-xl shadow-xl">

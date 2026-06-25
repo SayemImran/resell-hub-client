@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   Card,
@@ -9,8 +9,8 @@ import {
   Button,
   Avatar,
 } from "@heroui/react";
-import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import AddToCartButton from "./AddToCartButton";
 
 const ProductCard = ({ product }) => {
   const {
@@ -26,51 +26,11 @@ const ProductCard = ({ product }) => {
     stock,
   } = product;
 
-  const [placingOrder, setPlacingOrder] = useState(false);
-
   // No early return before this — keep hook order stable
   const { data: sessionData } = authClient.useSession();
   const currentUser = sessionData?.user;
 
   const isOwner = seller_info?.seller_id === currentUser?.id;
-
-  const handleOrder = async () => {
-    if (!currentUser) {
-      toast.error("Please log in to place an order.");
-      return;
-    }
-
-    try {
-      setPlacingOrder(true);
-
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/orders`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          buyerInfo: {
-            userId: currentUser.id,
-            name: currentUser.name,
-            email: currentUser.email,
-          },
-          productId: _id,
-          quantity: 1,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to place order");
-      }
-
-      toast.success("Order placed successfully!");
-    } catch (err) {
-      console.error("Failed to place order:", err);
-      toast.error(err.message || "Failed to place order. Please try again.");
-    } finally {
-      setPlacingOrder(false);
-    }
-  };
 
   return (
     <Card
@@ -151,7 +111,11 @@ const ProductCard = ({ product }) => {
 
         {/* Seller */}
         <div className="flex items-center gap-3 pt-2">
-          <Avatar size="sm" src={seller_info?.avatar} name={seller_info?.name} />
+          <Avatar
+            size="sm"
+            src={seller_info?.avatar}
+            name={seller_info?.name}
+          />
           <div>
             <p className="text-sm font-medium text-gray-800">
               {seller_info?.name}
@@ -163,14 +127,14 @@ const ProductCard = ({ product }) => {
 
       <CardFooter className="gap-2">
         {!isOwner && (
-          <Button
-            color="primary"
-            className="flex-1 font-medium"
-            isDisabled={stock <= 0 || placingOrder}
-            onClick={handleOrder}
-          >
-            {placingOrder ? "Placing..." : "Order now"}
-          </Button>
+          <div className="flex-1">
+            <AddToCartButton
+              productId={_id}
+              quantity={1}
+              currentUser={currentUser}
+              stock={stock}
+            />
+          </div>
         )}
 
         <Link href={`/products/${_id}`} className={isOwner ? "flex-1" : ""}>

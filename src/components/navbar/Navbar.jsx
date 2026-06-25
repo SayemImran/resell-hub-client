@@ -14,6 +14,7 @@ import {
 } from "@gravity-ui/icons";
 import { CustomAvatar } from "../profiles/CustomAvatar";
 import { authClient } from "@/lib/auth-client";
+import CartIcon from "../cart/CartIcon";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -88,7 +89,10 @@ export default function Navbar() {
           {/* Desktop Auth */}
           <div className="hidden md:flex items-center gap-3">
             {currentuser ? (
+              <>
+              <CartIcon />
               <CustomAvatar />
+              </>
             ) : (
               <>
                 <Link
@@ -147,7 +151,11 @@ export default function Navbar() {
             {/* Mobile Auth */}
             <div className="mt-5 flex flex-col gap-3">
               {currentuser ? (
+                <>
+                <CartIcon />
                 <CustomAvatar />
+                </>
+                
               ) : (
                 <>
                   <Link

@@ -24,6 +24,7 @@ const OrderCard = ({ order }) => {
     paymentStatus,
     orderStatus,
     sellerInfo,
+    paymentIntentId,
     createdAt,
   } = order;
 
@@ -68,6 +69,12 @@ const OrderCard = ({ order }) => {
         <p className="text-sm text-default-500">
           Qty: {quantity} × ${price} = <span className="font-semibold text-foreground">${totalAmount}</span>
         </p>
+
+        {paymentIntentId && (
+          <p className="truncate text-xs text-default-400">
+            Transaction ID: <span className="font-mono">{paymentIntentId}</span>
+          </p>
+        )}
       </div>
 
       {/* Status badges */}

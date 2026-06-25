@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Input, TextArea, Select, ListBox, Label } from "@heroui/react";
-import { authClient } from "@/lib/auth-client";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const categories = [
   "Electronics",
@@ -15,7 +15,7 @@ const categories = [
 
 const conditions = ["Used", "Like New", "Refurbished"];
 
-export default function AddProductForm() {
+export default function AddProductForm({ currentUser }) {
   const API_URL = process.env.NEXT_PUBLIC_API_URL;
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -27,13 +27,6 @@ export default function AddProductForm() {
     price: "",
     stock: "",
   });
-
-  const { data: sessionData, isLoading } = authClient.useSession();
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  const seller = sessionData?.user;
-  console.log("Current seller", seller);
 
   const handleChange = (field, value) => {
     setFormData((prev) => ({
@@ -48,12 +41,8 @@ export default function AddProductForm() {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API_URL}/api/product/add`, {
+      const response = await clientAuthFetch(`${API_URL}/api/product/add`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
         body: JSON.stringify({
           title: formData.title,
           imageUrl: formData.imageUrl,
@@ -64,9 +53,9 @@ export default function AddProductForm() {
           stock: Number(formData.stock),
           status: "available",
           seller_info: {
-            seller_id: seller?.id || "",
-            name: seller?.name || "",
-            email: seller?.email || "",
+            seller_id: currentUser?.id || "",
+            name: currentUser?.name || "",
+            email: currentUser?.email || "",
           },
         }),
       });
@@ -139,7 +128,7 @@ export default function AddProductForm() {
               <Select
                 className="w-full"
                 placeholder="Select Category"
-                name="category" // Added name attribute for form submission stability
+                name="category"
                 selectedKey={formData.category || null}
                 onSelectionChange={(value) => handleChange("category", value)}
               >
@@ -164,11 +153,10 @@ export default function AddProductForm() {
                 </Select.Popover>
               </Select>
 
-              {/* --- CONDITION SELECT --- */}
               <Select
                 className="w-full"
                 placeholder="Select Condition"
-                name="condition" // Added name attribute for form submission stability
+                name="condition"
                 selectedKey={formData.condition || null}
                 onSelectionChange={(value) => handleChange("condition", value)}
               >

@@ -1,20 +1,23 @@
 import React from "react";
-
 import { Sidebar } from "../../components/dashboard/Sidebar";
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
+
 const DashboardLayout = ({ children }) => {
   return (
-    <div className=" flex h-screen gap-3">
-      <div className="w-2/12">
-        <Sidebar />
+    // Root: stack vertically on mobile, row on md+
+    <div className="flex flex-col md:flex-row min-h-screen">
+
+      {/* Sidebar controls its own width — don't constrain it */}
+      <Sidebar />
+
+      {/* Content: takes all remaining space, scrolls independently */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        <DashboardNavbar />
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+          {children}
+        </main>
       </div>
 
-      <div className="w-10/12 flex flex-col gap-5">
-        <DashboardNavbar/>
-        <div className="">
-          <main>{children}</main>
-        </div>
-      </div>
     </div>
   );
 };

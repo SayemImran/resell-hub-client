@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, Chip } from "@heroui/react";
 import { Check, Xmark } from "@gravity-ui/icons";
 import { toast } from "sonner";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -102,7 +103,7 @@ const SellerOrderCard = ({ order, sellerId }) => {
     try {
       setUpdating(true);
 
-      const res = await fetch(`${API_URL}/api/orders/${_id}/status`, {
+      const res = await clientAuthFetch(`${API_URL}/api/orders/${_id}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus, sellerId }),

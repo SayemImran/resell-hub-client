@@ -12,6 +12,7 @@ import {
 } from "@heroui/react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const categories = [
   "Electronics",
@@ -46,7 +47,7 @@ export default function EditProductForm({ product }) {
 
   const onSubmit = async (data) => {
     try {
-      const res = await fetch(
+      const res = await clientAuthFetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/products/edit/${product._id}`,
         {
           method: "PATCH",

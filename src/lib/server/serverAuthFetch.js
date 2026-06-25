@@ -8,6 +8,7 @@ export async function serverAuthFetch(url, options = {}) {
     headers: await headers(),
   });
 
+  console.log(token);
   if (!token) {
     throw new Error("Authentication error. No session found.");
   }

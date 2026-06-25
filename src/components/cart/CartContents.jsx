@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@heroui/react";
 import { TrashBin, Boxes3 } from "@gravity-ui/icons";
 import { toast } from "sonner";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -23,7 +24,7 @@ const CartContents = ({ initialItems, userId }) => {
     );
 
     try {
-      await fetch(`${API_URL}/api/cart/${userId}/${productId}`, {
+      await clientAuthFetch(`${API_URL}/api/cart/${userId}/${productId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ quantity: newQuantity }),
@@ -38,7 +39,7 @@ const CartContents = ({ initialItems, userId }) => {
     setItems((prev) => prev.filter((item) => item.productId !== productId));
 
     try {
-      await fetch(`${API_URL}/api/cart/${userId}/${productId}`, {
+      await clientAuthFetch(`${API_URL}/api/cart/${userId}/${productId}`, {
         method: "DELETE",
       });
       toast("Removed from cart");

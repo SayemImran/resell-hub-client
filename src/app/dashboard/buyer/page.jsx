@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { Boxes3, Heart, BriefcaseFill, ShoppingCart } from "@gravity-ui/icons";
 import { Chip } from "@heroui/react";
 import OrderCard from "@/components/orders/OrderCard";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -26,8 +27,8 @@ const BuyerOverviewPage = async () => {
   const userId = session.user.id;
 
   const [ordersRes, wishlistRes] = await Promise.all([
-    fetch(`${API_URL}/api/orders/buyer/${userId}`, { cache: "no-store" }),
-    fetch(`${API_URL}/api/wishlist/${userId}`, { cache: "no-store" }),
+    serverAuthFetch(`${API_URL}/api/orders/buyer/${userId}`, { cache: "no-store" }),
+    serverAuthFetch(`${API_URL}/api/wishlist/${userId}`, { cache: "no-store" }),
   ]);
 
   const { data: orders = [] } = ordersRes.ok ? await ordersRes.json() : { data: [] };

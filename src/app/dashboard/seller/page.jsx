@@ -1,5 +1,6 @@
 import SellerDashboardOverview from "@/components/dashboard/overview/SellerDashboardOverview";
 import { auth } from "@/lib/auth";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 import { headers } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -14,8 +15,8 @@ export default async function SellerDashboard() {
   const sellerId = session.user.id;
 
   const [productsRes, ordersRes] = await Promise.all([
-    fetch(`${API_URL}/api/products?sellerId=${sellerId}`, { cache: "no-store" }),
-    fetch(`${API_URL}/api/orders/seller/${sellerId}`, { cache: "no-store" }),
+    serverAuthFetch(`${API_URL}/api/products?sellerId=${sellerId}`, { cache: "no-store" }),
+    serverAuthFetch(`${API_URL}/api/orders/seller/${sellerId}`, { cache: "no-store" }),
   ]);
 
   const { data: products = [] } = productsRes.ok ? await productsRes.json() : { data: [] };

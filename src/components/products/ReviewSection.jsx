@@ -5,6 +5,7 @@ import { Button, Chip } from "@heroui/react";
 import { Star } from "@gravity-ui/icons";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -45,7 +46,7 @@ const ReviewsSection = ({ productId }) => {
   const fetchReviews = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_URL}/api/reviews/${productId}`);
+      const res = await clientAuthFetch(`${API_URL}/api/reviews/${productId}`);
       const data = await res.json();
       setReviews(data.data || []);
       setAverageRating(data.averageRating || 0);
@@ -85,7 +86,7 @@ const ReviewsSection = ({ productId }) => {
     try {
       setSubmitting(true);
 
-      const res = await fetch(`${API_URL}/api/reviews`, {
+      const res = await clientAuthFetch(`${API_URL}/api/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

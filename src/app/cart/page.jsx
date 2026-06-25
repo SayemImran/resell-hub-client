@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import CartContents from "@/components/cart/CartContents";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -11,7 +12,7 @@ const CartPage = async () => {
     return <div className="p-16 text-center text-default-500">Please log in to view your cart.</div>;
   }
 
-  const res = await fetch(`${API_URL}/api/cart/${session.user.id}`, {
+  const res = await serverAuthFetch(`${API_URL}/api/cart/${session.user.id}`, {
     cache: "no-store",
   });
 

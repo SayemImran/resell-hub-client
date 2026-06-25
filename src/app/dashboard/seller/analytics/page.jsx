@@ -1,5 +1,6 @@
 import AnalyticsCharts from "@/components/dashboard/sellercomponents/AnalyticsCharts";
 import { auth } from "@/lib/auth";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 import { headers } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -11,7 +12,7 @@ const SellerAnalyticsPage = async () => {
     return <div className="p-16 text-center text-default-500">Please log in.</div>;
   }
 
-  const res = await fetch(`${API_URL}/api/orders/seller/${session.user.id}`, {
+  const res = await serverAuthFetch(`${API_URL}/api/orders/seller/${session.user.id}`, {
     cache: "no-store",
   });
 

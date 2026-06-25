@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Boxes3 } from "@gravity-ui/icons";
 import OrderCard from "@/components/orders/OrderCard";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 
 const BuyerOrdersPage = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -14,7 +15,7 @@ const BuyerOrdersPage = async () => {
     );
   }
 
-  const res = await fetch(
+  const res = await serverAuthFetch(
     `http://localhost:5000/api/orders/buyer/${session.user.id}`,
     { cache: "no-store" }
   );

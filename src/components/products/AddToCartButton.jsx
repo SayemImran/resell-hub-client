@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import { toast } from "sonner";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -20,7 +21,7 @@ const AddToCartButton = ({ productId, quantity = 1, currentUser, stock }) => {
     try {
       setAdding(true);
 
-      const res = await fetch(`${API_URL}/api/cart`, {
+      const res = await clientAuthFetch(`${API_URL}/api/cart`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

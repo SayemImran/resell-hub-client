@@ -1,5 +1,6 @@
 import CheckoutForm from "@/components/cart/CheckoutForm";
 import { auth } from "@/lib/auth";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 import { headers } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -11,7 +12,7 @@ const CheckoutPage = async () => {
     return <div className="p-16 text-center text-default-500">Please log in.</div>;
   }
 
-  const res = await fetch(`${API_URL}/api/cart/${session.user.id}`, { cache: "no-store" });
+  const res = await serverAuthFetch(`${API_URL}/api/cart/${session.user.id}`, { cache: "no-store" });
   const { data: cartItems } = res.ok ? await res.json() : { data: [] };
 
   if (cartItems.length === 0) {

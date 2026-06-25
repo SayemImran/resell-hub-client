@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ShoppingCart } from "@gravity-ui/icons";
 import { authClient } from "@/lib/auth-client";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -18,7 +19,7 @@ const CartIcon = () => {
 
     const fetchCartCount = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/cart/${userId}`);
+        const res = await clientAuthFetch(`${API_URL}/api/cart/${userId}`);
         if (!res.ok) return;
         const { data } = await res.json();
         setCount(data.reduce((sum, item) => sum + item.quantity, 0));

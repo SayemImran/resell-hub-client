@@ -6,6 +6,7 @@ import { Button, Chip } from "@heroui/react";
 import { Heart, CircleCheck } from "@gravity-ui/icons";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const ProductCategoryCard = ({ product, initialIsWishlisted = false, onOrderNow }) => {
   const [isWishlisted, setIsWishlisted] = useState(initialIsWishlisted);
@@ -30,7 +31,7 @@ const ProductCategoryCard = ({ product, initialIsWishlisted = false, onOrderNow 
 
     try {
       if (wasWishlisted) {
-        const res = await fetch(
+        const res = await clientAuthFetch(
           `http://localhost:5000/api/wishlist/${currentUser.id}/${product._id}`,
           { method: "DELETE" }
         );
@@ -38,7 +39,7 @@ const ProductCategoryCard = ({ product, initialIsWishlisted = false, onOrderNow 
         if (!res.ok) throw new Error("Failed to remove from wishlist");
         toast("Removed from wishlist");
       } else {
-        const res = await fetch("http://localhost:5000/api/wishlist", {
+        const res = await clientAuthFetch("http://localhost:5000/api/wishlist", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

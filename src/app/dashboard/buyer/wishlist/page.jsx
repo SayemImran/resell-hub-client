@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Boxes3 } from "@gravity-ui/icons";
 import WishlistCard from "@/components/products/WishlistCard";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 
 const WishlistPage = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -14,7 +15,7 @@ const WishlistPage = async () => {
     );
   }
 
-  const res = await fetch(
+  const res = await serverAuthFetch(
     `http://localhost:5000/api/wishlist/${session.user.id}`,
     { cache: "no-store" }
   );

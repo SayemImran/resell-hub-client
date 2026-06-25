@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button, Chip } from "@heroui/react";
 import { TrashBin } from "@gravity-ui/icons";
 import { toast } from "sonner";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const WishlistCard = ({ product, userId }) => {
   const router = useRouter();
@@ -17,7 +18,7 @@ const WishlistCard = ({ product, userId }) => {
     try {
       setRemoving(true);
 
-      const res = await fetch(`http://localhost:5000/api/wishlist/${userId}/${_id}`, {
+      const res = await clientAuthFetch(`http://localhost:5000/api/wishlist/${userId}/${_id}`, {
         method: "DELETE",
       });
 

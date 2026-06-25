@@ -6,6 +6,7 @@ import { Boxes3 } from "@gravity-ui/icons";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import ProductCategoryCard from "@/components/products/ProductCategoryCard";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const categories = ["All", "Electronics", "Accessories", "Sports", "Books"];
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -52,7 +53,7 @@ export default function CategoryPage() {
 
     const fetchWishlist = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/wishlist/${currentUserId}`);
+        const res = await clientAuthFetch(`${API_URL}/api/wishlist/${currentUserId}`);
 
         if (!res.ok) return; // fail quietly — wishlist hydration isn't critical path
 

@@ -1,75 +1,42 @@
-const testimonials = [
+const stories = [
   {
-    name: "Sarah Jenkins",
-    role: "Eco-conscious Buyer",
-    image: "/users/user1.jpg",
-    text: "I furnished my entire apartment using ReSell Hub and saved nearly $2,500.",
+    name: "Tahmid R.",
+    role: "Buyer",
+    quote: "Found a barely-used laptop at half the retail price. Saved a ton and got exactly what I needed.",
   },
   {
-    name: "David Lawson",
-    role: "Power Seller",
-    image: "/users/user2.jpg",
-    text: "Selling electronics has never been easier. The analytics are fantastic.",
+    name: "Nusrat J.",
+    role: "Seller",
+    quote: "Cleared out furniture I no longer needed and made back real money instead of throwing it away.",
   },
   {
-    name: "Elena Rodriguez",
-    role: "Verified Merchant",
-    image: "/users/user3.jpg",
-    text: "My business has grown 40% year-on-year thanks to this marketplace.",
+    name: "Imran H.",
+    role: "Buyer",
+    quote: "The seller communication and order tracking made the whole process feel safe and easy.",
   },
 ];
 
-export default function SuccessStories() {
+const SuccessStories = () => {
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 lg:px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold">
-            Stories from the Community
-          </h2>
+    <section className="px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <h2 className="text-3xl font-bold sm:text-4xl">Stories from our community</h2>
 
-          <p className="text-default-500 mt-2">
-            Join thousands of users making a difference.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {testimonials.map((item) => (
-            <TestimonialCard
-              key={item.name}
-              testimonial={item}
-            />
+        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {stories.map((story) => (
+            <div
+              key={story.name}
+              className="rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur-xl shadow-xl"
+            >
+              <p className="text-default-700">"{story.quote}"</p>
+              <p className="mt-4 text-sm font-semibold">{story.name}</p>
+              <p className="text-xs text-default-500">{story.role}</p>
+            </div>
           ))}
         </div>
       </div>
     </section>
   );
-}
+};
 
-function TestimonialCard({ testimonial }) {
-  return (
-    <div className="bg-white p-6 rounded-3xl shadow-sm hover:shadow-lg transition">
-      <div className="flex items-center gap-4 mb-4">
-        <img
-          src={testimonial.image}
-          alt={testimonial.name}
-          className="w-12 h-12 rounded-full object-cover"
-        />
-
-        <div>
-          <h4 className="font-semibold">
-            {testimonial.name}
-          </h4>
-
-          <p className="text-sm text-default-500">
-            {testimonial.role}
-          </p>
-        </div>
-      </div>
-
-      <p className="italic text-default-600">
-        "{testimonial.text}"
-      </p>
-    </div>
-  );
-}
+export default SuccessStories;

@@ -1,22 +1,33 @@
-import ExploreCategories from "@/components/home/ExploreCategories";
-import FeaturedDeals from "@/components/home/FeaturedDeals";
 import HeroSection from "@/components/home/HeroSection";
-import MarketplaceStats from "@/components/home/MarketplaceStats";
+import FeaturedProducts from "@/components/home/FeaturedProducts";
+import PopularCategories from "@/components/home/PopularCategories";
 import SuccessStories from "@/components/home/SuccessStories";
-import SustainabilitySection from "@/components/home/SustainabilitySection";
+import MarketplaceStats from "@/components/home/MarketplaceStats";
+import SustainabilityImpact from "@/components/home/SustainabilityImpact";
 import TrustedSellers from "@/components/home/TrustedSellers";
-import Image from "next/image";
 
-export default function Home() {
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+export default async function Home() {
+  const [productsRes, statsRes, sellersRes] = await Promise.all([
+    fetch(`${API_URL}/api/products?approvalStatus=approved&limit=6`, { cache: "no-store" }),
+    fetch(`${API_URL}/api/stats/marketplace`, { cache: "no-store" }),
+    fetch(`${API_URL}/api/sellers/trusted`, { cache: "no-store" }),
+  ]);
+
+  const { data: featuredProducts = [] } = productsRes.ok ? await productsRes.json() : { data: [] };
+  const { data: stats = {} } = statsRes.ok ? await statsRes.json() : { data: {} };
+  const { data: trustedSellers = [] } = sellersRes.ok ? await sellersRes.json() : { data: [] };
+
   return (
-    <>
-    <HeroSection/>
-    <ExploreCategories/>
-    <FeaturedDeals/>
-    <MarketplaceStats/>
-    <SustainabilitySection/>
-    <SuccessStories/>
-    <TrustedSellers/>
-    </>
+    <main className="overflow-hidden">
+      <HeroSection products={featuredProducts} />
+      <FeaturedProducts products={featuredProducts} />
+      <PopularCategories />
+      <MarketplaceStats stats={stats} />
+      <SuccessStories />
+      <TrustedSellers sellers={trustedSellers} />
+      <SustainabilityImpact />
+    </main>
   );
 }

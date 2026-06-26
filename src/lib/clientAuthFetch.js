@@ -4,8 +4,6 @@ import { authClient } from "@/lib/auth-client";
 
 export async function clientAuthFetch(url, options = {}) {
   const { data: tokenData, error } = await authClient.token();
-
-  console.log(tokenData?.token);
   
   if (error || !tokenData?.token) {
     console.error("Failed to get auth token:", error);

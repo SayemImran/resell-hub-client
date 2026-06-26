@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Persons, Boxes3, ShoppingCart } from "@gravity-ui/icons";
 import { Card } from "@heroui/react";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -20,7 +21,7 @@ const AdminOverviewPage = async () => {
     );
   }
 
-  const res = await fetch(`${API_URL}/api/admin/stats`, { cache: "no-store" });
+  const res = await serverAuthFetch(`${API_URL}/api/admin/stats`, { cache: "no-store" });
 
   const { data } = res.ok
     ? await res.json()

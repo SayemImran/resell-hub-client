@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Button, Chip, Input } from "@heroui/react";
 import { Magnifier, TrashBin } from "@gravity-ui/icons";
 import { toast } from "sonner";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -34,7 +35,7 @@ const UsersTable = ({ initialUsers, currentAdminId }) => {
     try {
       setUpdatingId(userId);
 
-      const res = await fetch(`${API_URL}/api/admin/users/${userId}/status`, {
+      const res = await clientAuthFetch(`${API_URL}/api/admin/users/${userId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accountStatus: newStatus }),
@@ -68,7 +69,7 @@ const UsersTable = ({ initialUsers, currentAdminId }) => {
     if (!confirm("Are you sure you want to permanently delete this user?")) return;
 
     try {
-      const res = await fetch(`${API_URL}/api/admin/users/${userId}`, {
+      const res = await clientAuthFetch(`${API_URL}/api/admin/users/${userId}`, {
         method: "DELETE",
       });
 

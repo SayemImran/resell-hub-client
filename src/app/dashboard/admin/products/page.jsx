@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Boxes3 } from "@gravity-ui/icons";
 import AdminProductCard from "@/components/dashboard/admin/AdminProductCard";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -22,7 +23,7 @@ const AdminProductsPage = async () => {
     );
   }
 
-  const res = await fetch(`${API_URL}/api/admin/products/pending`, {
+  const res = await serverAuthFetch(`${API_URL}/api/admin/products/pending`, {
     cache: "no-store",
   });
 

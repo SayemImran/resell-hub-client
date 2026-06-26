@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Chip } from "@heroui/react";
 import { toast } from "sonner";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -27,7 +28,7 @@ const AdminProductCard = ({ product }) => {
     try {
       setUpdating(true);
 
-      const res = await fetch(`${API_URL}/api/admin/products/${_id}/approval`, {
+      const res = await clientAuthFetch(`${API_URL}/api/admin/products/${_id}/approval`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ approvalStatus }),

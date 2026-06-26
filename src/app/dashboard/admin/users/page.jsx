@@ -1,5 +1,6 @@
 import UsersTable from "@/components/dashboard/admin/UserTable";
 import { auth } from "@/lib/auth";
+import { serverAuthFetch } from "@/lib/server/serverAuthFetch";
 import { headers } from "next/headers";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -19,7 +20,7 @@ const AdminUsersPage = async () => {
     );
   }
 
-  const res = await fetch(`${API_URL}/api/admin/users`, { cache: "no-store" });
+  const res = await serverAuthFetch(`${API_URL}/api/admin/users`, { cache: "no-store" });
   const { data: users } = res.ok ? await res.json() : { data: [] };
 
   return (

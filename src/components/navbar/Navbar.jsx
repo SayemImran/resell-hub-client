@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import {
   Bars,
   Xmark,
-  Magnifier,
   House,
   Boxes3,
   Folder,
@@ -20,18 +19,19 @@ export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: sessionData } = authClient.useSession();
-  const currentuser = sessionData?.user.name;
-  const role = sessionData?.user.role.toLowerCase();
- 
+  const currentuser = sessionData?.user?.name;
+  const role = sessionData?.user?.role?.toLowerCase();
 
-  if(pathname.includes('dashboard')){
+  if (pathname.includes("dashboard")) {
     return null;
   }
+
+  // Safely construct dashboard link if role exists
   const Links = [
     { name: "Home", href: "/", icon: House },
     { name: "Products", href: "/products", icon: Boxes3 },
     { name: "Category", href: "/category", icon: Folder },
-    { name: "Dashboard", href: `/dashboard/${role}`, icon: LayoutSideContent },
+    ...(role ? [{ name: "Dashboard", href: `/dashboard/${role}`, icon: LayoutSideContent }] : []),
   ];
 
   return (
@@ -70,28 +70,12 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Search */}
-          <div className="hidden md:block flex-1 max-w-md mx-8">
-            <div className="relative">
-              <Magnifier
-                width={18}
-                height={18}
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-              />
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="w-full rounded-full border border-white/20 bg-white/10 py-2.5 pl-11 pr-4 backdrop-blur-md outline-none focus:border-indigo-500"
-              />
-            </div>
-          </div>
-
-          {/* Desktop Auth */}
+          {/* Desktop Auth Actions */}
           <div className="hidden md:flex items-center gap-3">
             {currentuser ? (
               <>
-              <CartIcon />
-              <CustomAvatar />
+                <CartIcon />
+                <CustomAvatar />
               </>
             ) : (
               <>
@@ -111,7 +95,7 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Toggle */}
+          {/* Mobile Menu Toggle */}
           <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden">
             {menuOpen ? (
               <Xmark width={24} height={24} />
@@ -121,17 +105,9 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Slide-down Menu Container */}
         {menuOpen && (
           <div className="border-t border-white/10 px-6 py-4 lg:hidden">
-            <div className="mb-4">
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 outline-none"
-              />
-            </div>
-
             <div className="flex flex-col gap-2">
               {Links.map((item) => {
                 const Icon = item.icon;
@@ -148,14 +124,13 @@ export default function Navbar() {
               })}
             </div>
 
-            {/* Mobile Auth */}
+            {/* Mobile Auth Actions */}
             <div className="mt-5 flex flex-col gap-3">
               {currentuser ? (
-                <>
-                <CartIcon />
-                <CustomAvatar />
-                </>
-                
+                <div className="flex items-center gap-4 px-4 py-2 border-t border-white/5 pt-4">
+                  <CartIcon />
+                  <CustomAvatar />
+                </div>
               ) : (
                 <>
                   <Link

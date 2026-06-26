@@ -16,7 +16,7 @@ const WishlistPage = async () => {
   }
 
   const res = await serverAuthFetch(
-    `http://localhost:5000/api/wishlist/${session.user.id}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/wishlist/${session.user.id}`,
     { cache: "no-store" }
   );
 

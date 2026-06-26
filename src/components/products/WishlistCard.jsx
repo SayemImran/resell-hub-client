@@ -18,7 +18,7 @@ const WishlistCard = ({ product, userId }) => {
     try {
       setRemoving(true);
 
-      const res = await clientAuthFetch(`http://localhost:5000/api/wishlist/${userId}/${_id}`, {
+      const res = await clientAuthFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/wishlist/${userId}/${_id}`, {
         method: "DELETE",
       });
 

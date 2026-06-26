@@ -16,7 +16,7 @@ const BuyerOrdersPage = async () => {
   }
 
   const res = await serverAuthFetch(
-    `http://localhost:5000/api/orders/buyer/${session.user.id}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/orders/buyer/${session.user.id}`,
     { cache: "no-store" }
   );
 

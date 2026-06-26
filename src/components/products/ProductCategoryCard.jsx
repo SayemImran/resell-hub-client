@@ -32,14 +32,14 @@ const ProductCategoryCard = ({ product, initialIsWishlisted = false, onOrderNow 
     try {
       if (wasWishlisted) {
         const res = await clientAuthFetch(
-          `http://localhost:5000/api/wishlist/${currentUser.id}/${product._id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/wishlist/${currentUser.id}/${product._id}`,
           { method: "DELETE" }
         );
 
         if (!res.ok) throw new Error("Failed to remove from wishlist");
         toast("Removed from wishlist");
       } else {
-        const res = await clientAuthFetch("http://localhost:5000/api/wishlist", {
+        const res = await clientAuthFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/wishlist`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -32,8 +32,8 @@ const HeroSection = ({ products }) => {
           </h1>
 
           <p className="mt-6 max-w-md text-lg text-default-500">
-            Resell Hub connects buyers and sellers of pre-loved goods —
-            better for your wallet, better for the planet.
+            Resell Hub connects buyers and sellers of pre-loved goods — better
+            for your wallet, better for the planet.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
@@ -69,18 +69,30 @@ const HeroSection = ({ products }) => {
           {orbitItems.map((product, i) => {
             const angle = (i / orbitItems.length) * 2 * Math.PI;
             const radius = 180;
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
+            const offsetX = Math.round(Math.cos(angle) * radius - 32);
+            const offsetY = Math.round(Math.sin(angle) * radius - 32);
 
             return (
               <motion.div
                 key={product._id}
                 className="absolute h-16 w-16 overflow-hidden rounded-2xl border border-white/20 shadow-lg"
-                style={{ left: `calc(50% + ${x}px - 32px)`, top: `calc(50% + ${y}px - 32px)` }}
+                style={{
+                  left: `calc(50% + ${offsetX}px)`,
+                  top: `calc(50% + ${offsetY}px)`,
+                }}
                 animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 3, repeat: Infinity, delay: i * 0.3, ease: "easeInOut" }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  delay: i * 0.3,
+                  ease: "easeInOut",
+                }}
               >
-                <img src={product.imageUrl} alt={product.title} className="h-full w-full object-cover" />
+                <img
+                  src={product.imageUrl}
+                  alt={product.title}
+                  className="h-full w-full object-cover"
+                />
               </motion.div>
             );
           })}

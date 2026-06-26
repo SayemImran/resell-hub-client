@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button, Input, TextArea, Select, ListBox, Label } from "@heroui/react";
 import { clientAuthFetch } from "@/lib/clientAuthFetch";
+import { toast } from "sonner";
 
 const categories = [
   "Electronics",
@@ -66,7 +67,7 @@ export default function AddProductForm({ currentUser }) {
         throw new Error(data?.message || "Failed to add product");
       }
 
-      alert("Product added successfully!");
+      toast.success("Product added successfully!");
 
       setFormData({
         title: "",
@@ -79,7 +80,7 @@ export default function AddProductForm({ currentUser }) {
       });
     } catch (error) {
       console.error(error);
-      alert(error.message || "Something went wrong");
+      toast.error("Somehting went wrong")
     } finally {
       setLoading(false);
     }

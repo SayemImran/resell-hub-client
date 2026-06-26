@@ -13,6 +13,8 @@ import {
   CloudGear,
 } from "@gravity-ui/icons";
 import { authClient } from "@/lib/auth-client";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
+import { FaEye } from "react-icons/fa";
 
 export default function MyProducts() {
   const [products, setProducts] = useState([]);
@@ -37,7 +39,7 @@ export default function MyProducts() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
+        const res = await clientAuthFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products`);
 
         if (!res.ok) {
           throw new Error(`Request failed with status ${res.status}`);
@@ -75,8 +77,13 @@ export default function MyProducts() {
   }, [products, search, category]);
 
   const handleDelete = async (id) => {
+
+const url = `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`;
+  console.log("Deleting:", url); // 👈 check this in browser console
+  console.log("Product ID:", id); // 👈 check id is correct
+
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
+      const res = await clientAuthFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`, {
         method: "DELETE",
       });
 
@@ -270,7 +277,7 @@ export default function MyProducts() {
                     className="flex-1"
                   >
                     <Button size="sm" variant="flat" className="w-full">
-                      <Pencil width={16} />
+                      <FaEye/>
                       view
                     </Button>
                   </Link>

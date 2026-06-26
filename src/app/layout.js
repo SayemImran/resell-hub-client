@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
         <Navbar />
         <main>{children}</main>
         <Footer />
-        <Toaster />
+        <Toaster richColors closeButton position="top-right" />
         <div className="fixed inset-0 -z-10 overflow-hidden">
           <div className="absolute top-20 left-20 h-72 w-72 rounded-full bg-primary/20 blur-3xl" />
           <div className="absolute bottom-20 right-20 h-72 w-72 rounded-full bg-purple-500/20 blur-3xl" />

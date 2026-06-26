@@ -116,3 +116,79 @@
   --text-display-lg--letter-spacing: -0.02em;
   --text-display-lg--font-weight: 700;
 }
+
+/* Sonner toast customizations */
+[data-sonner-toaster] {
+  --width: 360px;
+  --offset-right: 24px;
+  --offset-left: 24px;
+  --offset-top: 24px;
+  --offset-bottom: 24px;
+}
+
+[data-sonner-toast] {
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+  color: var(--color-on-background);
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 12px 14px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.45);
+}
+
+[data-sonner-toast] [data-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  flex: 0 0 40px;
+  color: white;
+}
+
+[data-sonner-toast] [data-content] {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-sonner-toast] [data-title] {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+[data-sonner-toast] [data-description] {
+  font-size: 13px;
+  color: rgba(25, 27, 35, 0.75);
+  margin-top: 4px;
+}
+
+/* Success variant */
+[data-sonner-toast][data-type="success"] {
+  border-left: 4px solid var(--color-secondary);
+}
+
+[data-sonner-toast][data-type="success"] [data-icon] {
+  background: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+
+/* Error variant */
+[data-sonner-toast][data-type="error"] {
+  border-left: 4px solid var(--color-error);
+}
+
+[data-sonner-toast][data-type="error"] [data-icon] {
+  background: var(--color-error);
+  color: var(--color-on-error);
+}
+
+/* Slightly dim default/neutral toasts */
+[data-sonner-toast][data-type="default"] [data-icon] {
+  background: rgba(0,0,0,0.06);
+  color: var(--color-on-background);
+}
+

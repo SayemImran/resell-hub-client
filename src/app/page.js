@@ -10,14 +10,22 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default async function Home() {
   const [productsRes, statsRes, sellersRes] = await Promise.all([
-    fetch(`${API_URL}/api/products?approvalStatus=approved&limit=6`, { cache: "no-store" }),
+    fetch(`${API_URL}/api/products?approvalStatus=approved&limit=6`, {
+      cache: "no-store",
+    }),
     fetch(`${API_URL}/api/stats/marketplace`, { cache: "no-store" }),
     fetch(`${API_URL}/api/sellers/trusted`, { cache: "no-store" }),
   ]);
-
-  const { data: featuredProducts = [] } = productsRes.ok ? await productsRes.json() : { data: [] };
-  const { data: stats = {} } = statsRes.ok ? await statsRes.json() : { data: {} };
-  const { data: trustedSellers = [] } = sellersRes.ok ? await sellersRes.json() : { data: [] };
+ console.log(sellersRes);
+  const { data: featuredProducts = [] } = productsRes.ok
+    ? await productsRes.json()
+    : { data: [] };
+  const { data: stats = {} } = statsRes.ok
+    ? await statsRes.json()
+    : { data: {} };
+  const { data: trustedSellers = [] } = sellersRes.ok
+    ? await sellersRes.json()
+    : { data: [] };
 
   return (
     <main className="overflow-hidden">

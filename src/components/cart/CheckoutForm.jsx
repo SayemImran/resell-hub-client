@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, TextField, InputGroup, Label } from "@heroui/react";
 import { toast } from "sonner";
+import { clientAuthFetch } from "@/lib/clientAuthFetch";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,7 +29,7 @@ const CheckoutForm = ({ cartItems, currentUser }) => {
       setProcessing(true);
 
       // Step 1: create one order per cart item, linked by checkoutGroupId
-      const orderRes = await fetch(`${API_URL}/api/orders/checkout`, {
+      const orderRes = await clientAuthFetch(`${API_URL}/api/orders/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

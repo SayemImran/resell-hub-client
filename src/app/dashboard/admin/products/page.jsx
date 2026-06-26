@@ -10,15 +10,51 @@ const AdminProductsPage = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user) {
-    return <div className="p-16 text-center text-default-500">Please log in.</div>;
+    return (
+      <div className="p-16 text-center text-default-500">Please log in.</div>
+    );
   }
 
-  // Page-level gate — not real security yet, just hides the UI from non-admins
-  // TODO: once JWT/server auth is added, also verify role on the Express side
   if (session.user.role !== "Admin") {
     return (
-      <div className="p-16 text-center text-default-500">
-        You don't have permission to view this page.
+      <div className="min-h-[400px] flex items-center justify-center p-6">
+        <div className="max-w-md text-center space-y-6 p-8 rounded-3xl border border-slate-200 bg-white shadow-sm">
+          {/* Lock Icon */}
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-slate-400">
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+              />
+            </svg>
+          </div>
+
+          {/* Text Context */}
+          <div className="space-y-2">
+            <h3 className="text-lg font-bold text-slate-800">
+              Restricted Access
+            </h3>
+            <p className="text-sm text-slate-500 max-w-xs mx-auto">
+              You don't have the required account permissions to view this
+              dashboard page.
+            </p>
+          </div>
+
+          {/* Action Redirect */}
+          <button
+            type="button"
+            className="inline-flex items-center justify-center w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all active:scale-98"
+          >
+            <Link href="/">Return Home</Link>
+          </button>
+        </div>
       </div>
     );
   }
@@ -28,7 +64,11 @@ const AdminProductsPage = async () => {
   });
 
   if (!res.ok) {
-    return <div className="p-16 text-center text-danger">Could not load pending products.</div>;
+    return (
+      <div className="p-16 text-center text-danger">
+        Could not load pending products.
+      </div>
+    );
   }
 
   const { data: products } = await res.json();
@@ -44,8 +84,14 @@ const AdminProductsPage = async () => {
 
       {products.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-white/20 p-10 text-center sm:p-16">
-          <Boxes3 width={40} height={40} className="opacity-40 sm:h-12 sm:w-12" />
-          <h3 className="mt-4 text-lg font-semibold sm:text-xl">All Caught Up</h3>
+          <Boxes3
+            width={40}
+            height={40}
+            className="opacity-40 sm:h-12 sm:w-12"
+          />
+          <h3 className="mt-4 text-lg font-semibold sm:text-xl">
+            All Caught Up
+          </h3>
           <p className="mt-2 text-sm text-default-500 sm:text-base">
             No products waiting for approval.
           </p>

@@ -13,13 +13,14 @@ import { Envelope, Lock } from "@gravity-ui/icons";
 import { signIn } from "@/lib/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { GoogleSignInButton } from "../GoogleSignInButton";
 
 export default function LoginForm() {
   const router = useRouter();
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
       email: "",
@@ -114,27 +115,19 @@ export default function LoginForm() {
             )}
           />
 
-          {/* Forgot Password */}
-          <div className="flex justify-end mb-6">
-            <Link
-              href="/forgot-password"
-              className="text-xs text-primary hover:underline"
-            >
-              Forgot password?
-            </Link>
-          </div>
-
           {/* Button */}
           <Button
             type="submit"
             className="w-full"
             color="primary"
-            isDisabled={!isValid}
+            isLoading={isSubmitting}
           >
             Login
           </Button>
         </form>
-
+        <div className="flex items-center justify-center mt-3 b-6 bg-transparent">
+          <GoogleSignInButton />
+        </div>
         {/* Footer */}
         <p className="text-center text-sm text-default-500 mt-6">
           Don’t have an account?{" "}

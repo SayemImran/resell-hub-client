@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import ProductCategoryCard from "@/components/products/ProductCategoryCard";
 import { clientAuthFetch } from "@/lib/clientAuthFetch";
+import Loading from "../loading";
 
 const categories = ["All", "Electronics", "Accessories", "Sports", "Books"];
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -180,11 +181,9 @@ export default function CategoryPage() {
       </div>
 
       {/* Loading state */}
-      {/* {loading && (
-        <div className="flex items-center justify-center p-16">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
-        </div>
-      )} */}
+      {loading && (
+        <Loading/>
+      )}
 
       {/* Error state */}
       {!loading && error && (

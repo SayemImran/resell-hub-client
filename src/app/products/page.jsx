@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import ProductCard from "@/components/products/ProductCard";
+import Loading from "../loading";
 
 const ITEMS_PER_PAGE = 8; // Adjust this number to change how many items show per page
 
@@ -58,16 +59,11 @@ const AllProducts = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // if (loading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-  //       <div className="text-center">
-  //         <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-  //         <p className="mt-4 text-gray-600">Loading products...</p>
-  //       </div>
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <Loading/>
+    );
+  }
 
   if (error) {
     return (

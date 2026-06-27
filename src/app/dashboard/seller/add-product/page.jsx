@@ -6,11 +6,6 @@ import Link from "next/link";
 const AddProductPage = async () => {
   const session = await auth.api.getSession({ headers: await headers() });
 
-  if (!session?.user) {
-    return (
-      <div className="p-16 text-center text-default-500">Please log in.</div>
-    );
-  }
 
   if (!["Seller", "Admin"].includes(session.user.role)) {
     return (
@@ -39,7 +34,7 @@ const AddProductPage = async () => {
               Restricted Access
             </h3>
             <p className="text-sm text-slate-500 max-w-xs mx-auto">
-              You don't have the required account permissions to view this
+              You do not have the required account permissions to view this
               dashboard page.
             </p>
           </div>

@@ -180,11 +180,11 @@ export default function CategoryPage() {
       </div>
 
       {/* Loading state */}
-      {loading && (
+      {/* {loading && (
         <div className="flex items-center justify-center p-16">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-slate-200 border-t-blue-600" />
         </div>
-      )}
+      )} */}
 
       {/* Error state */}
       {!loading && error && (

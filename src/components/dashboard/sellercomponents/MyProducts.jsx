@@ -98,9 +98,9 @@ const url = `${process.env.NEXT_PUBLIC_API_URL}/api/products/${id}`;
   };
 
   // Loading check now happens in JSX, AFTER all hooks have run
-  if (sessionLoading) {
-    return <div>Loading...</div>;
-  }
+  // if (sessionLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
   return (
     <section className="space-y-8">
